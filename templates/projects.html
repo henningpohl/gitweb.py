@@ -1,0 +1,9 @@
+$def with(projects)
+
+<h2>Projects</h2>
+
+$if len(projects) is 0:
+	<p>No projects available</p>
+$else:
+	$for p in projects:
+		<p>$p.name</p>

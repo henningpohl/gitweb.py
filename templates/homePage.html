@@ -1,0 +1,36 @@
+$def with(news, projects, repositories)
+
+<div class="container-fluid">
+	<div class="row-fluid">
+		<div class="span7">
+			<h2>News</h2>
+			$if len(news) == 0:
+				<p>Nothing happening</p>
+			$else:
+				$for n in news:
+					<div class="well well-small">
+						<i class="icon-calendar"></i> $time.strftime("%b %d, %Y, %H:%M", time.gmtime(n.date)) <br/>
+						<i class="icon-user"></i> <a href="/$n.author">$n.author</a> to <i class="icon-folder-open"></i> <a href="/$n.ownerid/$n.repoid">$n.repoid</a> <br/>
+						<i class="icon-comment"></i> $n.message
+					</div>
+		</div>
+		<div class="span3">
+			<h4>Your projects</h4>
+			$if len(projects) == 0:
+				<p>Currently no projects</p>
+			$else:
+				<ul>
+				$for p in projects:
+					<li><a href="/$p.id">$p.name</a></li>
+				</ul>
+			$if len(repositories) == 0:
+				<p>Currently no repositories</p>
+			$else:
+				<h4>Your repositories</h4>
+				<ul>
+				$for r in repositories:
+					<li><a href="/$r.owner/$r.id">$r.name</a></li>
+				</ul>
+		</div>
+	</div>
+</div>

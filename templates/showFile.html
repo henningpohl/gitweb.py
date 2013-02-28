@@ -1,0 +1,30 @@
+$def with(owner, repoid, filename, style, filecontent)
+
+$var for_head:
+	<style type="text/css">
+		$style
+	</style>
+
+<div>
+	<h2>$repoid</h2>
+	<div class="input-prepend input-append">
+		<span class="add-on">HTTPS</span>
+		<input class="span5" id="prependedInput" type="text" value="https://$(ctx.host)/$(owner)/$(repoid).git">
+		<button class="btn" type="button"><i class="icon-share-alt"></i></button>
+	</div>
+</div>
+
+<ul class="nav nav-pills">
+	<li><a href="/$owner/$repoid">Files</a></li>
+	<li><a href="/$owner/$repoid/commits/master">Commits</a></li>
+	$#<li><a href="#" data-toggle="tab">Branches</a></li>
+</ul>
+
+<div>
+<h2>$filename</h2>
+<pre class="brush: $filename.rpartition('.')[-1]">
+$:filecontent
+</pre>
+
+</div>
+

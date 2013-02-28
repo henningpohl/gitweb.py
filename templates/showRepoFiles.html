@@ -1,0 +1,39 @@
+$def with(owner, repoid, filelist)
+
+<div>
+	<h2>$repoid</h2>
+	<div class="input-prepend input-append">
+		<span class="add-on">HTTPS</span>
+		<input class="span5" id="prependedInput" type="text" value="https://$(ctx.host)/$(owner)/$(repoid).git">
+		<button class="btn" type="button"><i class="icon-share-alt"></i></button>
+	</div>
+</div>
+
+<ul class="nav nav-pills">
+	<li class="active"><a href="/$owner/$repoid">Files</a></li>
+	<li><a href="/$owner/$repoid/commits/master">Commits</a></li>
+	$#<li><a href="#" data-toggle="tab">Branches</a></li>
+</ul>
+
+<div>
+<h2>Files</h2>
+<table class="table table-hover table-striped">
+<thead>
+	<tr>
+		<th>Filename</th>
+		<th>Last Change</th>
+		<th>Commit Message</th>
+	</tr>
+</thead>
+<tbody>
+$for f in filelist:
+	<tr>
+		<td><a href="/$owner/$repoid/blob/master/$f[0]">$f[0]</a></td>
+		<td>$time.strftime("%b %d, %Y, %H:%M", time.gmtime(f[1].authored_date))</td>
+		<td>$f[1].message</td>
+	</tr>
+</tbody>
+</table>
+
+</div>
+

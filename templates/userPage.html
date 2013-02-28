@@ -1,0 +1,10 @@
+$def with(user, repos)
+
+<div class="hero-unit">
+	<h1>$user.name</h1>
+</div>
+
+<ul>
+$for r in repos:
+	<li><a href="/$r.owner/$r.id">$r.name</a></li>
+</ul>

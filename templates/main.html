@@ -1,0 +1,65 @@
+﻿$def with (page)
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>GitWeb.py</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="shortcut icon" href="/static/favicon.ico" />
+<!--<link href="/static/reset.css" rel="stylesheet" type="text/css">
+<link href="/static/style.css" rel="stylesheet" type="text/css">//-->
+<link href="/static/bootstrap.min.css" rel="stylesheet" media="screen">
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script src="http://code.jquery.com/ui/1.10.1/jquery-ui.js"></script>
+<script src="/static/bootstrap.min.js"></script>
+$if 'for_head' in page:
+	$:page.for_head
+<style type="text/css">
+  body {
+	padding-top: 60px;
+	padding-bottom: 40px;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="navbar navbar-inverse navbar-fixed-top">
+	<div class="navbar-inner">
+		<div class="container">
+			<a class="brand" href="/"><img src="/static/logo.png" style="height:23px;" /></a>
+			$if session.loggedin:
+				<ul class="nav">
+					<li><a href="/newRepository"><i class="icon-plus icon-white"></i> Create Repository</a></li>
+					<li><a href="/newProject"><i class="icon-plus icon-white"></i> Create Project</a></li>
+					$if 'userrights' in session and session.userrights == 'administrator':
+						<li><a href="/adminPanel"><i class="icon-briefcase icon-white"></i> Admin Panel</a></li>
+				</ul>
+				<ul class="nav pull-right">
+					<li><a href="/$session.userid"><i class="icon-user icon-white"></i> $session.userfullname</a></li>
+					<li><a href="/settings"><i class="icon-cog icon-white"></i> Settings</a></li>
+					<li><a href="/logout"><i class="icon-off icon-white"></i> Sign out</a></li>
+				</ul>
+			$else:
+				<form class="navbar-form pull-right" action="/login" method="POST" >
+					<input class="span3" name="username" type="text" placeholder="Email or ldap username">
+					<input class="span2" name="password" type="password" placeholder="Password">
+					<button type="submit" class="btn">Sign in</button>
+				</form>
+		</div>
+	</div>
+</div>
+
+
+
+<div class="container">
+  $:page
+
+  <hr>
+  <footer>
+	<p>&copy; gitweb.py 2013</p>
+  </footer>
+</div>
+
+</body>
+</html>

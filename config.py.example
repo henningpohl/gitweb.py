@@ -1,0 +1,22 @@
+import web
+from auth import LocalAuth, LdapAuth
+
+# Page name
+web.config.pagename = "GitWeb.py Code Vault"
+
+# Authentication methods to enable
+web.config.authmethods = [LocalAuth(), LdapAuth()]
+
+# Ldap auth settings
+web.config.auth.ldapserver = "ldap://IP:PORT"
+web.config.auth.ldapbasedn = "ou=users,dc=HOST"
+
+# Password salt - change for your instance
+web.config.salt = "_________"
+
+# Initialize database object - 'db' should point to where you want to save the database
+web.config.db = web.database(dbn='sqlite', db='data.s3db')
+web.config.db.query("pragma foreign_keys=ON") # making sure constraints are enforced
+
+# Repository root path (either relative to webgit.py root folder or absolute)
+web.config.reporoot = "repositories/"

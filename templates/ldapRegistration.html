@@ -1,0 +1,79 @@
+$def with(form)
+
+$var for_head:
+	<script src="/static/removeDiacritics.js"></script>
+	<script src="/static/commoncode.js"></script>
+	<script>
+	$$(document).ready(function(){
+		function checkId() {
+			$$.get('/checkId?id=' + $$("#inputId").val(), function(data) {
+				if(data == "true") {
+					$$(".control-group:has(#inputId)").removeClass("error");
+					$$('#inputIdError').hide();
+					return true;
+				} else {
+					$$(".control-group:has(#inputId)").addClass("error");
+					$$('#inputIdError').show();
+					return false;
+				}
+			});
+		}
+		
+		$$('#inputIdError').hide();
+		
+		$$("#inputId").change(function() {
+			checkId();
+		});
+		
+		$$("#formSubmit").click(function(){
+			$$.get('/checkId?id=' + $$("#inputId").val(), function(data) {
+				if(data == "true") {
+					$$("#pickIdForm").submit()
+				} else {
+					$$("this").effect("shake", 500);
+					return false;
+				}
+			});
+			return false;
+		});
+	});
+	</script>
+
+<div class="hero-unit">
+	<h2>LDAP registration</h2>
+	<p>This is your first login. Please check your account data for correctness below. Here we also need to pick an identifier for you. 99% of the time that can be derived from your username or name, but in case there's a conflict with existing identifiers we can resolve it here.</p>
+	
+	<form action="/register" method="POST" id="pickIdForm"  class="form-horizontal">	
+		<div class="control-group">
+			<label class="control-label" for="inputName">Username</label>
+			<div class="controls">
+				<input type="text" name="username" class="input-xlarge" value="$form.username.value" readonly>
+			</div>
+		</div>
+	
+		<div class="control-group">
+			<label class="control-label" for="inputName">Name</label>
+			<div class="controls">
+				<input type="text" name="fullname" class="input-xlarge" value="$form.fullname.value" readonly>
+			</div>
+		</div>
+		
+		<div class="control-group">
+			<label class="control-label" for="inputId">Identifier</label>
+			<div class="controls">
+				<input type="text" id="inputId" name="id" class="input-xlarge" value="$form.id.value">
+			</div>
+		</div>
+		
+		<div id="inputIdError" class="alert alert-error">
+			Unfortunately, this identifier is already in use
+		</div>
+			
+		$if form.note:
+			<div class="alert alert-info">
+				$form.note
+			</div>
+		
+		<button class="btn btn-large btn-primary offset5" id="formSubmit" type="submit">Pick Identifier</button>
+	</form>
+</div>
