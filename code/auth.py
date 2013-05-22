@@ -58,7 +58,8 @@ class LdapAuth(Auth):
 
 			u = config.db.select('ldapusers', dict(u=username), where="username=$u", what="id, name").list()
 			if len(u) is not 1: # there is no such user yet, redirect to registration
-				raise RequireRegistrationException(username, cnsearch[0][1]['gecos'][0])
+                                cn = l.search_s(config.auth.ldapbasedn, ldap.SCOPE_SUBTREE, "uid=%s" % username, ["cn"])[0][1]['cn'][0]
+				raise RequireRegistrationException(username, cn)
 			
 			return True, {
 				'userid' : u[0].id, 

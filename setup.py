@@ -4,7 +4,9 @@ setup(
     name='gitweb.py',
     install_requires=[
         'web.py>=0.37',
-        'pygments'
+        'pygments',
+        'python-ldap',
+        'GitPython'
     ]    
 )
 

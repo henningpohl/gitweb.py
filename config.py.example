@@ -5,7 +5,8 @@ from auth import LocalAuth, LdapAuth
 web.config.pagename = "GitWeb.py Code Vault"
 
 # Authentication methods to enable
-web.config.authmethods = [LocalAuth(), LdapAuth()]
+web.config.auth = web.utils.storage()
+web.config.auth.methods = [LocalAuth(), LdapAuth()]
 
 # Ldap auth settings
 web.config.auth.ldapserver = "ldap://IP:PORT"
