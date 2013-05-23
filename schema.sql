@@ -11,7 +11,7 @@ DROP TABLE IF EXISTS localusers;
 DROP TABLE IF EXISTS owners;
 
 CREATE TABLE IF NOT EXISTS owners (
-	id NVARCHAR(255)  NOT NULL PRIMARY KEY,
+	id NVARCHAR(255)  NOT NULL CHECK(length(id) > 2) PRIMARY KEY,
 	type VARCHAR(20)  NOT NULL,
 	rights VARCHAR(20)  NOT NULL  DEFAULT 'none'
 );
@@ -50,18 +50,20 @@ CREATE TABLE IF NOT EXISTS project_users (
 );
 
 CREATE TABLE IF NOT EXISTS repositories (
-	id NVARCHAR(255)  NOT NULL,
-	name NVARCHAR(255)  NOT NULL,
-	owner NVARCHAR(255)  NOT NULL,
+	id NVARCHAR(255) NOT NULL CHECK(length(id) > 2),
+	name NVARCHAR(255) NOT NULL,
+	owner NVARCHAR(255) NOT NULL,
 	description NULL,
+	access NVARCHAR(10) NOT NULL DEFAULT 'private',
 	FOREIGN KEY (owner) REFERENCES owners(id),
 	PRIMARY KEY (owner, id)
 );
 
 CREATE TABLE IF NOT EXISTS repo_users (
-	repoid NVARCHAR(255)  NOT NULL,
-	repoowner NVARCHAR(255)  NOT NULL,
-	userid NVARCHAR(255)  NOT NULL,
+	repoid NVARCHAR(255) NOT NULL,
+	repoowner NVARCHAR(255) NOT NULL,
+	userid NVARCHAR(255) NOT NULL,
+	access NVARCHAR(10) NOT NULL DEFAULT 'read',
 	FOREIGN KEY (repoid, repoowner) REFERENCES repositories(id, owner),
 	FOREIGN KEY (userid) REFERENCES owners(id),
 	PRIMARY KEY (repoid, repoowner, userid)
@@ -142,7 +144,8 @@ BEGIN
 END;
 
 /* Create admin account with 'password' as password */
+/*
 INSERT INTO localusers VALUES ("admin", "Git Admin", "admin@localhost", "64986686b737bb7d8facfa5eac88c9a6d999fc6489b4b92a9b3641eafb6aa55b");
 UPDATE owners SET rights="administrator" WHERE id="admin";
-
+*/
 

@@ -28,9 +28,6 @@ class login:
             raise web.internalerror("No appropriate login method available")
 
         for ao in authOptions:
-            if ao.can_handle_user(f.d.username) == False:
-                continue
-
             try:
                 success, res = ao.login(f.d.username, f.d.password, web.config)
                 if success == True:

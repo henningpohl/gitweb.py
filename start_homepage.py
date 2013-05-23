@@ -20,7 +20,6 @@ if 'inet_pton' not in socket.__all__:
 
 import time
 import web
-from web import form
 
 urls = (
   '/favicon.ico',                             'favicon',
