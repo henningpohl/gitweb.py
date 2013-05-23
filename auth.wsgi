@@ -8,6 +8,7 @@ except NameError:
 sys.path.append(app_path)
 sys.path.append(os.path.join(app_path, "code"))
 import web
+os.chdir(app_path)
 import config
 from auth import RequireRegistrationException
 
