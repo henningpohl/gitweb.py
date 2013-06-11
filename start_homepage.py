@@ -35,7 +35,8 @@ urls = (
   '/([\w\-]+)',                               'browse.owner',
   '/([\w\-]+)/([\w\-]+)/commits/([\w\-]+)',   'browse.repositoryCommits',
   '/([\w\-]+)/([\w\-]+)/blob/([\w\-]+)/(.+)', 'browse.repositoryShowFile',
-  '/([\w\-]+)/([\w\-]+)',                     'browse.repositoryFiles',  
+  '/([\w\-]+)/([\w\-]+)/tree/([\w\-]+)/(.+)', 'browse.repositoryShowDirectory',
+  '/([\w\-]+)/([\w\-]+)',                     'browse.repositoryHome',  
 )
 
 app = web.application(urls, globals(), autoreload=False)

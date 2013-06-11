@@ -28,7 +28,11 @@ $def with(owner, repoid, filelist)
 <tbody>
 $for f in filelist:
 	<tr>
-		<td><a href="/$owner/$repoid/blob/master/$f[0]">$f[0]</a></td>
+		<td><a href="/$owner/$repoid/${f[0].type}/master/$f[0].path">$f[0].name</a></td>
+	$if f[1] == None:
+		<td></td>
+		<td></td>
+	$else:
 		<td>$time.strftime("%b %d, %Y, %H:%M", time.gmtime(f[1].authored_date))</td>
 		<td>$f[1].message</td>
 	</tr>
