@@ -5,20 +5,6 @@ $var for_head:
 	<script src="/static/commoncode.js"></script>
 	<script>
 	$$(document).ready(function(){
-		function checkRepo() {
-			$$.get('/checkRepo?id=' + $$("#inputId").val(), function(data) {
-				if(data == "true") {
-					$$(".control-group:has(#inputId)").removeClass("error");
-					$$('#inputIdError').hide();
-					return true;
-				} else {
-					$$(".control-group:has(#inputId)").addClass("error");
-					$$('#inputIdError').show();
-					return false;
-				}
-			});
-		}
-		
 		$$('#inputNameError').hide();
 		
 		var id_popover = $$("#inputName").popover({
@@ -97,9 +83,9 @@ $var for_head:
 		
 		
 	<div class="control-group">
-		<label class="control-label" for="inputName">Description (optional)</label>
+		<label class="control-label" for="inputDesc">Description (optional)</label>
 		<div class="controls">
-			<textarea name="desc" class="input-xlarge" rows="4"></textarea>
+			<textarea name="desc" id="inputDesc" class="input-xlarge" rows="4"></textarea>
 		</div>
 	</div>
 	

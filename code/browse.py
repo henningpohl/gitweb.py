@@ -19,6 +19,35 @@ render = web.template.render(
 class owner:
     @requires_login
     def GET(self, owner):
+        userinfo = web.config.db.select("owners", dict(u=owner), where="id=$u").list()
+        if len(userinfo) != 1:
+            return web.internalerror("Couldn't find user information")
+
+        if userinfo[0].type == "project":
+            return self.GET_project(owner)
+        else:
+            return self.GET_user(owner)
+        
+    def GET_project(self, owner):
+        projectinfo = web.config.db.select("projects", dict(u=owner), where="id=$u").list()
+        if len(projectinfo) != 1:
+            return web.internalerror("Couldn't find user information")
+        
+        repoquery = web.config.db.query(
+            """SELECT repositories.id, repositories.owner, repositories.name
+               FROM repo_users INNER JOIN repositories
+               ON repo_users.repoid = repositories.id
+               WHERE repo_users.userid = $u""", vars=dict(u=owner))
+
+        memberquery = web.config.db.query(
+            """SELECT users.id AS id, project_users.role AS role, users.name AS name
+               FROM project_users INNER JOIN users
+               ON project_users.userid = users.id
+               WHERE project_users.projectid = $u""", vars=dict(u=owner))
+
+        return render.projectPage(projectinfo[0], repoquery, memberquery)   
+
+    def GET_user(self, owner):
         userinfo = web.config.db.select("users", dict(u=owner), where="id=$u").list()
         if len(userinfo) != 1:
             return web.internalerror("Couldn't find user information")
@@ -29,11 +58,16 @@ class owner:
                ON repo_users.repoid = repositories.id
                WHERE repo_users.userid = $u""", vars=dict(u=owner))
 
-        return render.userPage(userinfo[0], repoquery)
+        projectquery = web.config.db.query(
+            """SELECT project_users.projectid AS id, projects.name AS name
+               FROM project_users INNER JOIN projects
+               ON project_users.projectid = projects.id
+               WHERE project_users.userid = $u""", vars=dict(u=owner))
+
+        return render.userPage(userinfo[0], repoquery, projectquery)   
 
 class repositoryHome:
     def GET(self, owner, repoId):
-
         repo = Repo(os.path.join(web.config.reporoot, owner, repoId + ".git"))
         if 'master' not in repo.heads:
             return render.showRepoFiles(owner, repoId, [])

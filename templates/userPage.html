@@ -1,10 +1,17 @@
-$def with(user, repos)
+$def with(user, repos, projects)
 
 <div class="hero-unit">
 	<h1>$user.name</h1>
 </div>
 
+<h2>Repositories</h2>
 <ul>
 $for r in repos:
 	<li><a href="/$r.owner/$r.id">$r.name</a></li>
+</ul>
+
+<h2>Projects</h2>
+<ul>
+$for p in projects:
+	<li><a href="/$p.id">$p.name</a></li>
 </ul>

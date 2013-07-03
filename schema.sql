@@ -127,6 +127,7 @@ END;
 CREATE TRIGGER project_creation BEFORE INSERT ON projects
 BEGIN
 	INSERT INTO owners VALUES(NEW.id, "project", "none");
+	INSERT INTO project_users VALUES(NEW.id, NEW.owner, "admin");
 END;
 
 /* Make project ids immutable */
