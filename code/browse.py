@@ -21,7 +21,7 @@ class owner:
     def GET(self, owner):
         userinfo = web.config.db.select("owners", dict(u=owner), where="id=$u").list()
         if len(userinfo) != 1:
-            return web.internalerror("Couldn't find user information")
+            raise web.notfound()
 
         if userinfo[0].type == "project":
             return self.GET_project(owner)
@@ -68,24 +68,43 @@ class owner:
 
 class repositoryHome:
     def GET(self, owner, repoId):
+        d = dict(o=owner,i=repoId,u=web.config.session.userid)
+        repoInfo = web.config.db.select('repositories', d, where="id=$i and owner=$o", what="description,access,name").list()
+        if len(repoInfo) != 1:
+            return web.internalerror("Invalid repository")
+
+        repoInfo = repoInfo[0]
+        curUserRights = web.config.db.select('repo_users', d, where="repoid=$i and repoowner=$o and userid=$u", what="access").list()
+        if len(curUserRights) == 1 and curUserRights[0].access == "admin":
+            repoInfo.userLevel = "admin"
+        
         repo = Repo(os.path.join(web.config.reporoot, owner, repoId + ".git"))
         if 'master' not in repo.heads:
-            return render.showRepoFiles(owner, repoId, [])
+            return render.showRepoFiles(owner, repoId, repoInfo, [])
         
         tree = repo.heads.master.commit.tree
         curHashes = [entry.hexsha for entry in tree]
         changeinfo = gitHelper.get_last_updating_commit(repo, 'master', curHashes)
         filelist = [(entry, changeinfo[entry.hexsha]) for entry in tree]
         
-        return render.showRepoFiles(owner, repoId, filelist)
+        return render.showRepoFiles(owner, repoId, repoInfo, filelist)
 
 class repositoryCommits:
     def GET(self, owner, repoId, branch):
+        d = dict(o=owner,i=repoId,u=web.config.session.userid)
+        repoInfo = web.config.db.select('repositories', d, where="id=$i and owner=$o", what="description,access,name").list()
+        if len(repoInfo) != 1:
+            return web.internalerror("Invalid repository")
 
+        repoInfo = repoInfo[0]
+        curUserRights = web.config.db.select('repo_users', d, where="repoid=$i and repoowner=$o and userid=$u", what="access").list()
+        if len(curUserRights) == 1 and curUserRights[0].access == "admin":
+            repoInfo.userLevel = "admin"
+            
         repo = Repo(os.path.join(web.config.reporoot, owner, repoId + ".git"))
         commits = repo.iter_commits('master', max_count=20)
        
-        return render.showRepoCommits(owner, repoId, commits)
+        return render.showRepoCommits(owner, repoId, repoInfo, commits)
 
 def path_parts(path):
     parts = []
@@ -102,7 +121,7 @@ class repositoryShowFile:
                 return entry
         return None
     
-    def GET(self, owner, repoId, branch, filepath):        
+    def GET(self, owner, repoId, branch, filepath):
         repo = Repo(os.path.join(web.config.reporoot, owner, repoId + ".git"))
 
         curnode = repo.heads.master.commit.tree

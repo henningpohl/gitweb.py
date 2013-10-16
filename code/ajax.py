@@ -1,5 +1,7 @@
 import os
+import json
 import web
+from decorators import requires_login
 
 class checkId:
     def GET(self):
@@ -25,6 +27,19 @@ class checkRepo:
         if len(u) is 0:
             return "true"
         else:
-            return "false"    
+            return "false"
+
+class getInfo:
+    @requires_login
+    def GET(self):
+        if 'type' not in web.input():
+            return ""
+
+        if web.input().type == 'users':
+            users = web.config.db.select('users', what='id,name').list()
+            return json.dumps(users)
+        else:
+            return ""
+        
 
 

@@ -130,6 +130,13 @@ BEGIN
 	INSERT INTO project_users VALUES(NEW.id, NEW.owner, "admin");
 END;
 
+/* Trigger to make repository owners automatically admins */
+
+CREATE TRIGGER repository_creation AFTER INSERT ON repositories 
+BEGIN 
+	INSERT INTO repo_users VALUES(NEW.id, NEW.owner, NEW.owner, "admin");
+END;
+
 /* Make project ids immutable */
 
 CREATE TRIGGER pid_change BEFORE UPDATE ON projects WHEN NEW.id != OLD.id

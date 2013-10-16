@@ -103,7 +103,8 @@ def make_id_string(s):
 def check_id_exact(id):
     # Ids can't be keywords already used in urls
     if id.lower() in ["register", "login", "logout", "checkid", "checkrepo",
-                      "newrepository", "newproject", "adminpanel", "admin"]:
+                      "newrepository", "newproject", "adminpanel", "admin",
+                      "allProjects", "allRepositories", "search"]:
         return False
     
     return True

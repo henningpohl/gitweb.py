@@ -17,8 +17,13 @@ def create_database(dbname):
 
     con = sqlite3.connect('data.s3db')
     cur = con.cursor()
-    cur.executescript(script)
-    con.close()
+    try:
+        cur.executescript(script)
+    except:
+        print "Could not create database"
+        raise
+    finally:
+        con.close()
 
 
 if __name__ == '__main__':

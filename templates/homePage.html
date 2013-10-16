@@ -15,6 +15,11 @@ $def with(news, projects, repositories)
 					</div>
 		</div>
 		<div class="span3">
+			<h4>Overview</h4>
+				<ul>
+					<li><a href="/allProjects">See all public projects</a></li>
+					<li><a href="/allRepositories">See all public repositories</a></li>
+				</ul>
 			<h4>Your projects</h4>
 			$if len(projects) == 0:
 				<p>Currently no projects</p>
@@ -29,7 +34,7 @@ $def with(news, projects, repositories)
 				<h4>Your repositories</h4>
 				<ul>
 				$for r in repositories:
-					<li><a href="/$r.owner/$r.id">$r.name</a></li>
+					<li><a href="/$r.owner/$r.id">$r.owner/$r.name</a></li>
 				</ul>
 		</div>
 	</div>

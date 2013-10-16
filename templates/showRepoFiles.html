@@ -1,43 +1,58 @@
-$def with(owner, repoid, filelist)
+$def with(owner, repoid, repoInfo, filelist)
 
-<div>
-	<h2>$repoid</h2>
-	<div class="input-prepend input-append">
-		<span class="add-on">HTTPS</span>
-		<input class="span5" id="prependedInput" type="text" value="https://$(ctx.host)/$(owner)/$(repoid).git">
-		<button class="btn" type="button"><i class="icon-share-alt"></i></button>
+<div class="container-fluid">
+	<div class="row">
+		<div class="span12">
+			<h2>$repoInfo.name</h2>
+		</div>
+	</div>
+	<div class="row-fluid">
+	<div class="span9">
+		<ul class="nav nav-pills">
+			<li class="active"><a href="/$owner/$repoid">Files</a></li>
+			<li><a href="/$owner/$repoid/commits/master">Commits</a></li>
+			$#<li><a href="#" data-toggle="tab">Branches</a></li>
+		</ul>
+		
+		<h2>Files</h2>
+		<table class="table table-hover table-striped">
+		<thead>
+			<tr>
+				<th>Filename</th>
+				<th>Last Change</th>
+				<th>Commit Message</th>
+			</tr>
+		</thead>
+		<tbody>
+		$for f in filelist:
+			<tr>
+				<td><a href="/$owner/$repoid/${f[0].type}/master/$f[0].path">$f[0].name</a></td>
+			$if f[1] == None:
+				<td></td>
+				<td></td>
+			$else:
+				<td>$time.strftime("%b %d, %Y, %H:%M", time.gmtime(f[1].authored_date))</td>
+				<td>$f[1].message</td>
+			</tr>
+		</tbody>
+		</table>
+	</div>
+	<div class="span3">
+		<ul class="nav nav-tabs nav-stacked">
+			<li class="active"><a href="/$owner/$repoid">Code</a></li>
+			$if 'userLevel' in repoInfo and repoInfo.userLevel == 'admin':
+				<li><a href="/$owner/$repoid/settings">Settings</a></li>
+			$else:
+				<li class="disabled"><a>Settings</a></li>
+		</ul>
+		
+		HTTPS repository URL:
+		<div class="input-prepend input-append">
+			<input class="span10" id="prependedInput" type="text" value="https://$(ctx.host)/$(owner)/$(repoid).git">
+			<button class="btn" type="button"><i class="icon-share-alt"></i></button>
+		</div>
+	</div>
 	</div>
 </div>
 
-<ul class="nav nav-pills">
-	<li class="active"><a href="/$owner/$repoid">Files</a></li>
-	<li><a href="/$owner/$repoid/commits/master">Commits</a></li>
-	$#<li><a href="#" data-toggle="tab">Branches</a></li>
-</ul>
-
-<div>
-<h2>Files</h2>
-<table class="table table-hover table-striped">
-<thead>
-	<tr>
-		<th>Filename</th>
-		<th>Last Change</th>
-		<th>Commit Message</th>
-	</tr>
-</thead>
-<tbody>
-$for f in filelist:
-	<tr>
-		<td><a href="/$owner/$repoid/${f[0].type}/master/$f[0].path">$f[0].name</a></td>
-	$if f[1] == None:
-		<td></td>
-		<td></td>
-	$else:
-		<td>$time.strftime("%b %d, %Y, %H:%M", time.gmtime(f[1].authored_date))</td>
-		<td>$f[1].message</td>
-	</tr>
-</tbody>
-</table>
-
-</div>
 

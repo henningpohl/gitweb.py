@@ -32,10 +32,13 @@ class home:
                WHERE project_users.userid = $u""", vars=dict(u=web.config.session.userid)).list()
         
         repolist = web.config.db.query(
-            """SELECT repositories.id, repositories.owner, repositories.name FROM repo_users
-               INNER JOIN repositories
+            """SELECT repositories.id, repositories.owner, repositories.name
+               FROM repo_users INNER JOIN repositories
                ON repo_users.repoid = repositories.id
-               WHERE repo_users.userid = $u""", vars=dict(u=web.config.session.userid)).list()
+               WHERE repo_users.userid = $u
+               OR repo_users.userid IN (
+                 SELECT projectid FROM project_users WHERE project_users.userid = $u
+               )""", vars=dict(u=web.config.session.userid)).list()
 
         commits = []
         for r in repolist:

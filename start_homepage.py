@@ -29,13 +29,17 @@ urls = (
   '/logout',                                  'login.logout',
   '/checkId',                                 'ajax.checkId',
   '/checkRepo',                               'ajax.checkRepo',
+  '/getInfo',                                 'ajax.getInfo',
   '/newRepository',                           'repositories.create',
   '/newProject',                              'projects.create',
   '/adminPanel',                              'admin.adminPanel',
+  '/allProjects',                             'overview.allProjects',
+  '/allRepositories',                         'overview.allRepositories',
   '/([\w\-]+)',                               'browse.owner',
   '/([\w\-]+)/([\w\-]+)/commits/([\w\-]+)',   'browse.repositoryCommits',
   '/([\w\-]+)/([\w\-]+)/blob/([\w\-]+)/(.+)', 'browse.repositoryShowFile',
   '/([\w\-]+)/([\w\-]+)/tree/([\w\-]+)/(.+)', 'browse.repositoryShowDirectory',
+  '/([\w\-]+)/([\w\-]+)/settings',            'repositories.settings',
   '/([\w\-]+)/([\w\-]+)',                     'browse.repositoryHome',  
 )
 
@@ -52,8 +56,17 @@ class favicon:
     def GET(self):
         raise web.redirect("/static/favicon.ico")
 
+render = web.template.render(
+    'templates/',
+    base='main',
+    globals={'time':time, 'session':web.config.session, 'ctx':web.ctx})
+
 def notfound():
-    return web.notfound("404")
+    try:
+        return web.notfound(render.notFound())
+    except AttributeError, e:
+        print e
+        return web.notfound("Sorry, the page was not found")
 app.notfound = notfound
 
 if __name__ == "__main__":
