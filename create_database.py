@@ -2,11 +2,16 @@ import os
 import sqlite3
 
 def create_database(dbname):
-    if os.path.exists('schema.sql') == False:
-        print "Can't find schema.sql, aborting"
+    if os.path.exists('schema_base.sql') == False:
+        print "Can't find schema_base.sql, aborting"
         return
 
-    script = open('schema.sql', 'r').read()
+    if os.path.exists('schema_ext.sql') == False:
+        print "Can't find schema_ext.sql, aborting"
+        return
+
+    base_script = open('schema_base.sql', 'r').read()
+    ext_script = open('schema_ext.sql', 'r').read()
     
     if os.path.exists('data.s3db'):
         print "Database already exists, overwrite? (y/n)"
@@ -18,7 +23,8 @@ def create_database(dbname):
     con = sqlite3.connect('data.s3db')
     cur = con.cursor()
     try:
-        cur.executescript(script)
+        cur.executescript(base_script)
+        cur.executescript(ext_script)
     except:
         print "Could not create database"
         raise
