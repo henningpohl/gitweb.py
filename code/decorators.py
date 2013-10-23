@@ -11,7 +11,7 @@ def requires_login(func):
 def requires_admin(func):
     def wrapped(*args, **kwargs):
         rights = web.config.get('session', {}).get('userrights', "none")
-        if rights == "administrator":
+        if rights == "admin":
             return func(*args, **kwargs)
         else:
             raise web.seeother('/')

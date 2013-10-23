@@ -80,9 +80,9 @@ class adminPanel:
         return "deleted"
 
     def promote_user(self, userid):
-        web.config.db.update("owners", where="id=$u", vars=dict(u=userid), rights="administrator")
+        web.config.db.update("owners", where="id=$u", vars=dict(u=userid), rights="admin")
         if web.config.session.userid == userid:
-            web.config.session.userrights = "administrator"
+            web.config.session.userrights = "admin"
         
         return "promoted"
 
