@@ -44,8 +44,11 @@ $def with(owner, repoid, repoInfo, commits)
 		
 		HTTPS repository URL:
 		<div class="input-prepend input-append">
-			<input class="span10" id="prependedInput" type="text" value="https://$(ctx.host)/$(owner)/$(repoid).git">
-			<button class="btn" type="button"><i class="icon-share-alt"></i></button>
+			<input class="span10 repoUrl" type="text" value="https://$(ctx.host)/$(owner)/$(repoid).git">
+			<button class="btn repoUrlButton" type="button" data-clipboard-text="https://$(ctx.host)/$(owner)/$(repoid).git" title="copy to clipboard"><i class="icon-share-alt"></i></button>
+			<script type="text/javascript">
+				var clip = new ZeroClipboard($$(".repoUrlButton"), {moviePath: "/static/ZeroClipboard.swf"});
+			</script>
 		</div>
 	</div>
 	</div>
