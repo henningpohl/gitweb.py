@@ -1,12 +1,20 @@
-#!/bin/python
+#!/usr/bin/python
 import os
 import shutil
 from git import *
 import sqlite3
+import tarfile
+
+##
+## For deployment via git push, create a bare repository
+## and rename this file to REPO_PATH/hooks/post-receive.
+## Update SITE_DIR to the directory to deploy to.
+##
 
 def delete_old_files(path):
     rmDirs = ["code", "doc", "static", "templates"]
     rmFiles = ["*.py", "schema_base.sql", "schema_ext.sql", "auth.wsgi"]
+    keepFiles = ["config.py"]
 
     for d in rmDirs:
         shutil.rmtree(os.path.join(path, d), True)
@@ -15,6 +23,8 @@ def delete_old_files(path):
             _, ext = os.path.splitext(f)
             filelist = [f for f in os.listdir(path) if f.endswith(ext)]
             for f in filelist:
+                if f in keepFiles:
+                    continue
                 try:
                     os.remove(os.path.join(path, f))
                 except:
@@ -27,7 +37,12 @@ def delete_old_files(path):
 
 def checkout_from_repo(path):
     repo = Repo(".")
-    repo.index.checkout(force=True, prefix=path)
+    archive_file_path = os.path.join(path, "repo.tar")
+    repo.archive(open(archive_file_path, 'wb'), format='tar')
+    archive_file = tarfile.open(archive_file_path)
+    archive_file.extractall(path)
+    archive_file.close()
+    os.remove(archive_file_path)
 
 def query_db(con, statement):
     res = []
