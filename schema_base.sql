@@ -76,3 +76,21 @@ CREATE TABLE IF NOT EXISTS sessions (
 	atime TIMESTAMP NOT NULL default current_timestamp,
 	data TEXT
 );
+
+/* New view showing all users */
+CREATE VIEW IF NOT EXISTS users AS
+	SELECT id, type, rights, name, identifier 
+	FROM owners INNER JOIN (
+		SELECT id, name, email AS identifier FROM localusers
+		UNION
+		SELECT id, name, username AS identifier FROM ldapusers)
+	USING (id);
+
+/* View aggregating all repository access rights */
+CREATE VIEW IF NOT EXISTS repo_access AS
+	SELECT id as userid, repoid, repoowner, access 
+	FROM users INNER JOIN repo_users ON (id = userid)
+	UNION
+	SELECT project_users.userid AS userid, repoid, repoowner, 
+	CASE WHEN project_users.role = "member" AND repo_users.access = "admin" THEN "write" ELSE repo_users.access END AS access
+	FROM project_users INNER JOIN repo_users ON (projectid = repo_users.userid);

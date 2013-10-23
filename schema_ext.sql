@@ -1,23 +1,5 @@
 PRAGMA foreign_keys = ON;
 
-/* New view showing all users */
-CREATE VIEW IF NOT EXISTS users AS
-	SELECT id, type, rights, name, identifier 
-	FROM owners INNER JOIN (
-		SELECT id, name, email AS identifier FROM localusers
-		UNION
-		SELECT id, name, username AS identifier FROM ldapusers)
-	USING (id);
-
-/* View aggregating all repository access rights */
-CREATE VIEW IF NOT EXISTS repo_access AS
-	SELECT id as userid, repoid, repoowner, access 
-	FROM users INNER JOIN repo_users ON (id = userid)
-	UNION
-	SELECT project_users.userid AS userid, repoid, repoowner, 
-	CASE WHEN project_users.role = "member" AND repo_users.access = "admin" THEN "write" ELSE repo_users.access END AS access
-	FROM project_users INNER JOIN repo_users ON (projectid = repo_users.userid);
-
 /* Trigger to automatically populate owner table on user creation */
 
 CREATE TRIGGER local_user_creation BEFORE INSERT ON localusers
@@ -27,7 +9,7 @@ END;
 
 CREATE TRIGGER ldap_user_creation BEFORE INSERT ON ldapusers
 BEGIN
-	INSERT INTO owners VALUES(NEW.id, "ldapuser", "member");
+	INSERT INTO owners VALUES(NEW.id, "ldapuser", "ldap");
 END;
 
 /* Retain userid in owner table but mark as deleted user on user deletion */
