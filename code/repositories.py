@@ -51,7 +51,7 @@ class create:
             print f.d
             web.config.db.insert('repositories', id=f.d.id, name=f.d.name, owner=f.d.owner, description=f.d.desc, access=f.d.access)
             # A trigger adds rights to repo_users at this point
-            git.Repo.init(repoPath, bare=True)
+            git.Repo.init(repoPath, bare=True, shared="group")
             transaction.commit()
             return web.seeother("/%s/%s" % (f.d.owner, f.d.id))
         except Exception, e:
