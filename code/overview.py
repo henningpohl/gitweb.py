@@ -18,7 +18,7 @@ render = web.template.render(
 
  
 
-class allGroupss:
+class allGroups:
     @requires_login
     def GET(self):
         grouplist = web.config.db.query(
@@ -30,8 +30,9 @@ class allGroupss:
                 COUNT(group_users.userid) AS num_users,
                 COUNT(repositories.id) AS num_repos
               FROM groups
-                INNER JOIN group_users ON groups.id = group_users.groupid
-                INNER JOIN repositories ON groups.id = repositories.owner""").list()
+                LEFT JOIN group_users ON groups.id = group_users.groupid
+                LEFT JOIN repositories ON groups.id = repositories.owner
+              GROUP BY groups.id""").list()
         
         return render.allGroups(grouplist)
 
