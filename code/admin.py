@@ -18,6 +18,10 @@ class adminPanel:
     @requires_login
     def GET(self):
         userlist = web.config.db.select("users").list()
+        for u in userlist:
+            auth = [m for m in web.config.auth.methods if m.get_usertype() == u.type][0]
+            u.userrights = auth.get_rights(u.id, web.config)
+        
         projectlist = web.config.db.select("projects").list()
         repositorylist = web.config.db.select("repositories").list()
 

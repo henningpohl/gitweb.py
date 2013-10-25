@@ -40,7 +40,7 @@ class login:
                 web.config.session.showIdentifierRegistration = True
                 web.config.session.userid = info.username
                 web.config.session.userfullname = info.userfullname
-                web.config.session.userrights = "member"
+                web.config.session.userrights = "none"
                 raise web.seeother('/register')
 
         raise web.seeother("/")

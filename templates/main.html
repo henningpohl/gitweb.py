@@ -34,12 +34,12 @@ $if 'for_head' in page:
 				<ul class="nav">
 					<li><a href="/newRepository"><i class="icon-plus icon-white"></i> Create Repository</a></li>
 					<li><a href="/newProject"><i class="icon-plus icon-white"></i> Create Project</a></li>
-					$if 'userrights' in session and session.userrights == 'administrator':
-						<li><a href="/adminPanel"><i class="icon-briefcase icon-white"></i> Admin Panel</a></li>
 				</ul>
 				<ul class="nav pull-right">
 					<li><a href="/$session.userid"><i class="icon-user icon-white"></i> $session.userfullname</a></li>
 					<li><a href="/settings"><i class="icon-cog icon-white"></i> Settings</a></li>
+					$if 'userrights' in session and session.userrights == 'admin':
+						<li><a href="/adminPanel"><i class="icon-briefcase icon-white"></i> Admin Panel</a></li>
 					<li><a href="/logout"><i class="icon-off icon-white"></i> Sign out</a></li>
 				</ul>
 			$else:

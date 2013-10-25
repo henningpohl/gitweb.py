@@ -58,9 +58,11 @@ class register:
         if not f.validates():
             return render.ldapRegistration(f)
 
+        auth = [m for m in web.config.auth.methods if m.get_usertype() == 'ldapuser'][0]
         web.config.db.insert('ldapusers', id=f.d.id, username=f.d.username, name=f.d.fullname)
         web.config.session.loggedin = True
         web.config.session.userid = f.d.id
+        web.config.session.userrights = auth.get_rights(f.d.username, web.config)
         del web.config.session.showIdentifierRegistration
         raise web.seeother('/')
     

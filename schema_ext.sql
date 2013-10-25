@@ -4,24 +4,34 @@ PRAGMA foreign_keys = ON;
 
 CREATE TRIGGER local_user_creation BEFORE INSERT ON localusers
 BEGIN
-	INSERT INTO owners VALUES(NEW.id, "localuser", "none");
+	INSERT INTO owners VALUES(NEW.id, "localuser");
 END;
 
 CREATE TRIGGER ldap_user_creation BEFORE INSERT ON ldapusers
 BEGIN
-	INSERT INTO owners VALUES(NEW.id, "ldapuser", "ldap");
+	INSERT INTO owners VALUES(NEW.id, "ldapuser");
 END;
 
 /* Retain userid in owner table but mark as deleted user on user deletion */
 
 CREATE TRIGGER local_user_deletion AFTER DELETE ON localusers
 BEGIN
-	UPDATE owners SET type="deleted" WHERE id=OLD.id;
+	DELETE FROM owners WHERE id=OLD.id;
 END;
 
-CREATE TRIGGER ldap_user_deletion AFTER DELETE ON localusers
+CREATE TRIGGER ldap_user_deletion AFTER DELETE ON ldapusers
 BEGIN
-	UPDATE owners SET type="deleted" WHERE id=OLD.id;
+	DELETE FROM owners WHERE id=OLD.id;
+END;
+
+/* Prevent deletion of owners */
+
+CREATE TRIGGER owner_delete BEFORE DELETE ON owners
+BEGIN
+	UPDATE repositories SET owner = "dummy" WHERE owner = OLD.id;
+	DELETE FROM repo_users WHERE userid = OLD.id;
+	UPDATE projects SET owner = "dummy" WHERE owner = OLD.id;
+	DELETE FROM project_users WHERE userid = OLD.id;
 END;
 
 /* Make user ids immutable */
@@ -40,7 +50,7 @@ END;
 
 CREATE TRIGGER project_creation BEFORE INSERT ON projects
 BEGIN
-	INSERT INTO owners VALUES(NEW.id, "project", "none");
+	INSERT INTO owners VALUES(NEW.id, "project");
 	INSERT INTO project_users VALUES(NEW.id, NEW.owner, "admin");
 END;
 
@@ -57,17 +67,3 @@ CREATE TRIGGER pid_change BEFORE UPDATE ON projects WHEN NEW.id != OLD.id
 BEGIN
 	SELECT RAISE(FAIL, 'can''t change projects id');
 END;
-
-/* Prevent deletion of owners */
-
-CREATE TRIGGER owner_protect BEFORE DELETE ON owners
-BEGIN
-	SELECT RAISE(FAIL, 'can''t delete owners');
-END;
-
-/* Create admin account with 'password' as password */
-/*
-INSERT INTO localusers VALUES ("admin", "Git Admin", "admin@localhost", "64986686b737bb7d8facfa5eac88c9a6d999fc6489b4b92a9b3641eafb6aa55b");
-UPDATE owners SET rights="administrator" WHERE id="admin";
-*/
-

@@ -13,8 +13,7 @@ DROP TABLE IF EXISTS owners;
 
 CREATE TABLE IF NOT EXISTS owners (
 	id NVARCHAR(255)  NOT NULL CHECK(length(id) > 2) PRIMARY KEY,
-	type VARCHAR(20)  NOT NULL,
-	rights VARCHAR(20)  NOT NULL  DEFAULT 'none'
+	type VARCHAR(20)  NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS ldapusers (
@@ -29,6 +28,7 @@ CREATE TABLE IF NOT EXISTS localusers (
 	name NVARCHAR(255)  NOT NULL,
 	email NVARCHAR(255)  NULL,
 	password NVARCHAR(64)  NOT NULL,
+	rights VARCHAR(20)  NOT NULL  DEFAULT 'none',
 	FOREIGN KEY (id) REFERENCES owners(id)
 );
 
@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS sessions (
 
 /* New view showing all users */
 CREATE VIEW IF NOT EXISTS users AS
-	SELECT id, type, rights, name, identifier 
+	SELECT id, type, name, identifier 
 	FROM owners INNER JOIN (
 		SELECT id, name, email AS identifier FROM localusers
 		UNION
@@ -94,3 +94,6 @@ CREATE VIEW IF NOT EXISTS repo_access AS
 	SELECT project_users.userid AS userid, repoid, repoowner, 
 	CASE WHEN project_users.role = "member" AND repo_users.access = "admin" THEN "write" ELSE repo_users.access END AS access
 	FROM project_users INNER JOIN repo_users ON (projectid = repo_users.userid);
+	
+/* Create dummy owner to transfer repositories and project on owner deletion */
+INSERT INTO owners VALUES ("dummy", "dummy");

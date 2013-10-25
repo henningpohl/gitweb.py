@@ -19,6 +19,12 @@ class Auth(object):
     def can_handle_user(self, username):
 	return False
 
+    def get_rights(self, uid, config):
+        return 'none'
+
+    def get_usertype(self):
+        raise NotImplementedError
+
 class LocalAuth(Auth):
     def __init__(self):
 	self.name = "local"
@@ -30,19 +36,22 @@ class LocalAuth(Auth):
 	    return True, {
 		'userid' : u[0].id, 
 		'userfullname' : u[0].name, 
-		'rights' : self._get_rights(u[0].id, config)
+		'rights' : self.get_rights(u[0].id, config)
 	    }
 	return False, {}
 		
     def can_handle_user(self, username):
 	return "@" in username
 
-    def _get_rights(self, uid, config):
-	rights = config.db.select('owners', dict(u=uid), where="id=$u", what="rights").list()
+    def get_rights(self, uid, config):
+	rights = config.db.select('localusers', dict(u=uid), where="id=$u", what="rights").list()
 	if len(rights) == 1:
 	    return rights[0]
 	else:
 	    return "member"
+
+    def get_usertype(self):
+        return "localuser"
 
 class LdapAuth(Auth):
     def __init__(self):
@@ -60,21 +69,10 @@ class LdapAuth(Auth):
                 cn = l.search_s(config.auth.ldapbasedn, ldap.SCOPE_SUBTREE, "uid=%s" % username, ["cn"])[0][1]['cn'][0]
                 raise RequireRegistrationException(username, cn)
 
-            groupFilter = "memberUid=%s" % username
-            memberships = l.search_s(config.auth.ldapgroupdn, ldap.SCOPE_SUBTREE, groupFilter, ['cn'])
-            memberships = [attrs['cn'][0] for dn, attrs in memberships]
-
-            if 'admin' in memberships:
-                rights = "admin"
-            elif 'git' in memberships:
-                rights = "member"
-            else:
-                rights = "member" # TODO: update later
-
             return True, {
                 'userid' : u[0].id, 
                 'userfullname' : u[0].name, 
-                'rights' : rights
+                'rights' : self.get_rights(username, config)
             }
                 
         except ldap.INVALID_CREDENTIALS:
@@ -85,3 +83,27 @@ class LdapAuth(Auth):
 
     def can_handle_user(self, username):
 	return "@" not in username
+
+    def get_rights(self, uid, config):
+        try:
+            l = ldap.initialize(config.auth.ldapserver)
+            l.protocol_version = ldap.VERSION3
+
+            groupFilter = "memberUid=%s" % uid
+            isAdmin = len(l.search_s(config.auth.ldapadmingroup, ldap.SCOPE_BASE, groupFilter)) >= 1
+            isUser = len(l.search_s(config.auth.ldapusergroup, ldap.SCOPE_BASE, groupFilter)) >= 1
+
+            if isAdmin:            
+                return "admin"
+            elif isUser:
+                return "member"
+
+        except ldap.INVALID_CREDENTIALS:
+            print "Invalid credentials"
+        except ldap.LDAPError, error_message:
+            print "LDAP error: ", error_message
+            
+        return 'none'
+
+    def get_usertype(self):
+        return "ldapuser"

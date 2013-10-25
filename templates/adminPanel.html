@@ -146,14 +146,14 @@ $for u in userlist:
 		<td>$u.type</td>
 		<td>$u.identifier</td>
 		<td>$u.name</td>
-		<td>$u.rights</td>
+		<td>$u.userrights</td>
 		<td>
 			<div class="btn-group">
-			$if u.rights == "member":
+			$if u.userrights == "member":
 				<button class="btn userPromote" data-userid="$u.id" title="Make user admin"><i class="icon-chevron-up"></i></button>
-			$if u.rights == "administrator":
+			$if u.userrights == "admin":
 				<button class="btn userDemote" data-userid="$u.id" title="Remove admin status"><i class="icon-chevron-down"></i></button>
-			$if u.rights == "none":
+			$if u.userrights == "none":
 				<button class="btn userApprove" data-userid="$u.id" title="Approve user"><i class="icon-ok-sign"></i></button>
 			$if True:
 				<button class="btn userDelete" data-userid="$u.id" data-usertype="$u.type" title="Delete user"><i class="icon-trash"></i></button>
