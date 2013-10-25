@@ -26,7 +26,12 @@ $def with(owner, repoid, repoInfo, filelist)
 		<tbody>
 		$for f in filelist:
 			<tr>
-				<td><a href="/$owner/$repoid/${f[0].type}/master/$f[0].path">$f[0].name</a></td>
+				$if f[0].type == "blob":
+					<td><i class="icon-file"></i> <a href="/$owner/$repoid/${f[0].type}/master/$f[0].path">$f[0].name</a></td>
+				$elif f[0].type == "tree":
+					<td><i class="icon-folder-open"></i> <a href="/$owner/$repoid/${f[0].type}/master/$f[0].path">$f[0].name</a></td>
+				$else:
+					<td><i class=" icon-question-sign"></i> <a href="/$owner/$repoid/${f[0].type}/master/$f[0].path">$f[0].name</a></td>
 			$if f[1] == None:
 				<td></td>
 				<td></td>

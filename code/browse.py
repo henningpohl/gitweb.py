@@ -2,7 +2,7 @@ import os
 import time
 import hashlib
 from pygments import highlight
-from pygments.lexers import get_lexer_for_filename
+from pygments.lexers import get_lexer_for_filename, get_lexer_by_name
 from pygments.formatters import HtmlFormatter
 from git import *
 import web
@@ -131,7 +131,10 @@ class repositoryShowFile:
         except KeyError, e:
             return web.notfound()
 
-        lexer = get_lexer_for_filename(filepath)
+        try:
+            lexer = get_lexer_for_filename(filepath)
+        except:
+            lexer = get_lexer_by_name("text")
         formatter = HtmlFormatter(linenos=True, cssclass="code")
         style = formatter.get_style_defs()
         style = """
@@ -145,8 +148,13 @@ class repositoryShowFile:
             
 class repositoryShowDirectory:
     def GET(self, owner, repoId, branch, dirpath):
-        repo = Repo(os.path.join(web.config.reporoot, owner, repoId + ".git"))
+        d = dict(o=owner,i=repoId,u=web.config.session.userid)
+        repoInfo = web.config.db.select('repositories', d, where="id=$i and owner=$o", what="description,access,name").list()
+        if len(repoInfo) != 1:
+            return web.internalerror("Invalid repository")
 
+        repoInfo = repoInfo[0]
+        repo = Repo(os.path.join(web.config.reporoot, owner, repoId + ".git"))
         curnode = repo.heads.master.commit.tree
         try:
             for segment in path_parts(dirpath):
@@ -158,6 +166,6 @@ class repositoryShowDirectory:
         changeinfo = gitHelper.get_last_updating_commit(repo, 'master', curHashes)
         filelist = [(entry, changeinfo[entry.hexsha]) for entry in curnode]
        
-        return render.showRepoFiles(owner, repoId, filelist)
+        return render.showRepoFiles(owner, repoId, repoInfo, filelist)
 
 
