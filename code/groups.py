@@ -10,8 +10,8 @@ render = web.template.render(
     base='main',
     globals={'time':time, 'session':web.config.session})
 
-project_register_form = form.Form(
-    form.Textbox("name", description="Project name"),
+group_register_form = form.Form(
+    form.Textbox("name", description="Group name"),
     form.Textbox("id", description="Identifier"),
     form.Textarea("desc", description="Description"),
     validators = [
@@ -21,15 +21,15 @@ project_register_form = form.Form(
 class create:
     @requires_login
     def GET(self):
-        f = project_register_form()
-        return render.createProject(f)
+        f = group_register_form()
+        return render.createGroup(f)
 
     @requires_login
     def POST(self):
-        f = project_register_form()
+        f = group_register_form()
         if not f.validates():
-            return render.createProject(f)
+            return render.createGroup(f)
 
-        web.config.db.insert('projects', id=f.d.id, name=f.d.name, description=f.d.desc, owner=web.config.session.userid)
+        web.config.db.insert('groups', id=f.d.id, name=f.d.name, description=f.d.desc, owner=web.config.session.userid)
         raise web.seeother('/' + f.d.id)
 

@@ -23,14 +23,14 @@ class owner:
         if len(userinfo) != 1:
             raise web.notfound()
 
-        if userinfo[0].type == "project":
-            return self.GET_project(owner)
+        if userinfo[0].type == "group":
+            return self.GET_group(owner)
         else:
             return self.GET_user(owner)
         
-    def GET_project(self, owner):
-        projectinfo = web.config.db.select("projects", dict(u=owner), where="id=$u").list()
-        if len(projectinfo) != 1:
+    def GET_group(self, owner):
+        groupinfo = web.config.db.select("groups", dict(u=owner), where="id=$u").list()
+        if len(groupinfo) != 1:
             return web.internalerror("Couldn't find user information")
         
         repoquery = web.config.db.query(
@@ -40,12 +40,12 @@ class owner:
                WHERE repo_users.userid = $u""", vars=dict(u=owner))
 
         memberquery = web.config.db.query(
-            """SELECT users.id AS id, project_users.role AS role, users.name AS name
-               FROM project_users INNER JOIN users
-               ON project_users.userid = users.id
-               WHERE project_users.projectid = $u""", vars=dict(u=owner))
+            """SELECT users.id AS id, group_users.role AS role, users.name AS name
+               FROM group_users INNER JOIN users
+               ON group_users.userid = users.id
+               WHERE group_users.groupid = $u""", vars=dict(u=owner))
 
-        return render.projectPage(projectinfo[0], repoquery, memberquery)   
+        return render.groupPage(groupinfo[0], repoquery, memberquery)   
 
     def GET_user(self, owner):
         userinfo = web.config.db.select("users", dict(u=owner), where="id=$u").list()
@@ -58,13 +58,13 @@ class owner:
                ON repo_users.repoid = repositories.id
                WHERE repo_users.userid = $u""", vars=dict(u=owner))
 
-        projectquery = web.config.db.query(
-            """SELECT project_users.projectid AS id, projects.name AS name
-               FROM project_users INNER JOIN projects
-               ON project_users.projectid = projects.id
-               WHERE project_users.userid = $u""", vars=dict(u=owner))
+        groupquery = web.config.db.query(
+            """SELECT group_users.groupid AS id, groups.name AS name
+               FROM group_users INNER JOIN groups
+               ON group_users.groupid = groups.id
+               WHERE group_users.userid = $u""", vars=dict(u=owner))
 
-        return render.userPage(userinfo[0], repoquery, projectquery)   
+        return render.userPage(userinfo[0], repoquery, groupquery)   
 
 class repositoryHome:
     def GET(self, owner, repoId):

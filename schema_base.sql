@@ -5,8 +5,8 @@ DROP VIEW IF EXISTS repo_access;
 DROP TABLE IF EXISTS sessions;
 DROP TABLE IF EXISTS repo_users;
 DROP TABLE IF EXISTS repositories;
-DROP TABLE IF EXISTS project_users;
-DROP TABLE IF EXISTS projects;
+DROP TABLE IF EXISTS group_users;
+DROP TABLE IF EXISTS groups;
 DROP TABLE IF EXISTS ldapusers;
 DROP TABLE IF EXISTS localusers;
 DROP TABLE IF EXISTS owners;
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS localusers (
 	FOREIGN KEY (id) REFERENCES owners(id)
 );
 
-CREATE TABLE IF NOT EXISTS projects (
+CREATE TABLE IF NOT EXISTS groups (
 	id NVARCHAR(255)  PRIMARY KEY,
 	name NVARCHAR(255)  NOT NULL,
 	owner NVARCHAR(255)  NOT NULL,
@@ -41,13 +41,13 @@ CREATE TABLE IF NOT EXISTS projects (
 	FOREIGN KEY (owner) REFERENCES owners(id)
 );
 
-CREATE TABLE IF NOT EXISTS project_users (
-	projectid NVARCHAR(255) NOT NULL,
+CREATE TABLE IF NOT EXISTS group_users (
+	groupid NVARCHAR(255) NOT NULL,
 	userid NVARCHAR(255) NOT NULL,
 	role NVARCHAR(16) NOT NULL DEFAULT 'member',
-	FOREIGN KEY (projectid) REFERENCES projects(id),
+	FOREIGN KEY (groupid) REFERENCES groups(id),
 	FOREIGN KEY (userid) REFERENCES owners(id),
-	PRIMARY KEY (projectid, userid)
+	PRIMARY KEY (groupid, userid)
 );
 
 CREATE TABLE IF NOT EXISTS repositories (
@@ -91,9 +91,9 @@ CREATE VIEW IF NOT EXISTS repo_access AS
 	SELECT id as userid, repoid, repoowner, access 
 	FROM users INNER JOIN repo_users ON (id = userid)
 	UNION
-	SELECT project_users.userid AS userid, repoid, repoowner, 
-	CASE WHEN project_users.role = "member" AND repo_users.access = "admin" THEN "write" ELSE repo_users.access END AS access
-	FROM project_users INNER JOIN repo_users ON (projectid = repo_users.userid);
+	SELECT group_users.userid AS userid, repoid, repoowner, 
+	CASE WHEN group_users.role = "member" AND repo_users.access = "admin" THEN "write" ELSE repo_users.access END AS access
+	FROM group_users INNER JOIN repo_users ON (groupid = repo_users.userid);
 	
-/* Create dummy owner to transfer repositories and project on owner deletion */
+/* Create dummy owner to transfer repositories and groups on owner deletion */
 INSERT INTO owners VALUES ("dummy", "dummy");

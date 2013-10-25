@@ -103,8 +103,8 @@ def make_id_string(s):
 def check_id_exact(id):
     # Ids can't be keywords already used in urls
     if id.lower() in ["register", "login", "logout", "checkid", "checkrepo",
-                      "newrepository", "newproject", "adminpanel", "admin",
-                      "allProjects", "allRepositories", "search"]:
+                      "newrepository", "newgroup", "adminpanel", "admin",
+                      "allgroups", "allrepositories", "search"]:
         return False
     
     return True
@@ -113,7 +113,7 @@ def check_id_exact(id):
 def check_id_similar(id):
     id = id.lower()
     keywords = ["register", "login", "logout", "checkid", "checkrepo",
-                "newrepository", "newproject", "adminpanel", "admin"]
+                "newrepository", "newgroup", "adminpanel", "admin"]
     
     # ids can't be similar to keywords
     for keyword in keywords:

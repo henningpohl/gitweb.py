@@ -4,7 +4,7 @@ __all__ = [
     "checkId",
     "home",
     "login",
-    "projects",
+    "groups",
     "repositories",
     "register",
     "users"]

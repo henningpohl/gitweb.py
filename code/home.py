@@ -25,11 +25,11 @@ class home:
         return render.welcomePage(web.config.pagename, web.config.auth.methods, register.register_form)
 
     def home_page(self):
-        projectlist = web.config.db.query(
-            """SELECT projects.id, projects.name FROM project_users
-               INNER JOIN projects
-               ON project_users.projectid = projects.id
-               WHERE project_users.userid = $u""", vars=dict(u=web.config.session.userid)).list()
+        grouplist = web.config.db.query(
+            """SELECT groups.id, groups.name FROM group_users
+               INNER JOIN groups
+               ON group_users.groupid = groups.id
+               WHERE group_users.userid = $u""", vars=dict(u=web.config.session.userid)).list()
         
         repolist = web.config.db.query(
             """SELECT repositories.id, repositories.owner, repositories.name
@@ -37,7 +37,7 @@ class home:
                ON repo_users.repoid = repositories.id
                WHERE repo_users.userid = $u
                OR repo_users.userid IN (
-                 SELECT projectid FROM project_users WHERE project_users.userid = $u
+                 SELECT groupid FROM group_users WHERE group_users.userid = $u
                )""", vars=dict(u=web.config.session.userid)).list()
 
         commits = []
@@ -51,7 +51,7 @@ class home:
                     author = c.author,
                     message = c.message))
         
-        return render.homePage(commits, projectlist, repolist)
+        return render.homePage(commits, grouplist, repolist)
 
 
     

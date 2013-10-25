@@ -18,22 +18,22 @@ render = web.template.render(
 
  
 
-class allProjects:
+class allGroupss:
     @requires_login
     def GET(self):
-        projectlist = web.config.db.query(
+        grouplist = web.config.db.query(
             """SELECT
-                projects.id AS id,
-                projects.name AS name,
-                projects.owner AS owner,
-                projects.description AS description,
-                COUNT(project_users.userid) AS num_users,
+                groups.id AS id,
+                groups.name AS name,
+                groups.owner AS owner,
+                groups.description AS description,
+                COUNT(group_users.userid) AS num_users,
                 COUNT(repositories.id) AS num_repos
-              FROM projects
-                INNER JOIN project_users ON projects.id = project_users.projectid
-                INNER JOIN repositories ON projects.id = repositories.owner""").list()
+              FROM groups
+                INNER JOIN group_users ON groups.id = group_users.groupid
+                INNER JOIN repositories ON groups.id = repositories.owner""").list()
         
-        return render.allProjects(projectlist)
+        return render.allGroups(grouplist)
 
 class allRepositories:
     @requires_login

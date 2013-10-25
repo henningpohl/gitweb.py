@@ -22,7 +22,7 @@ class adminPanel:
             auth = [m for m in web.config.auth.methods if m.get_usertype() == u.type][0]
             u.userrights = auth.get_rights(u.id, web.config)
         
-        projectlist = web.config.db.select("projects").list()
+        grouplist = web.config.db.select("groups").list()
         repositorylist = web.config.db.select("repositories").list()
 
         filesystemrepos = set(gen_repository_list("repositories"))
@@ -32,7 +32,7 @@ class adminPanel:
         notindatabaserepos = filesystemrepos.difference(databaserepos)
         #notindatabaserepos = [os.path.split(nr) for nr in notindatabaserepos]
        
-        return render.adminPanel(userlist, projectlist, repositorylist, notindatabaserepos)
+        return render.adminPanel(userlist, grouplist, repositorylist, notindatabaserepos)
 
     @requires_admin
     @requires_login  
@@ -49,8 +49,8 @@ class adminPanel:
             return self.demote_user(cmd.userId)
         elif cmd.action == "approveUser":
             return self.approve_user(cmd.userId)
-        elif cmd.action == "deleteProject":
-            return self.delete_project(cmd.projectId)
+        elif cmd.action == "deleteGroup":
+            return self.delete_group(cmd.groupId)
         elif cmd.action == "assignLostRepo":
             return self.assign_lost_repo(cmd.repopath, cmd.userid)
         elif cmd.action == "deleteLostRepo":
@@ -69,9 +69,9 @@ class adminPanel:
         
         shutil.rmtree(repopath)
 
-    def delete_project(self, projectid):
-        web.config.db.delete("projects", where="id=$u", vars=dict(u=projectid))
-        web.config.db.delete("project_users", where="projectid=$u", vars=dict(u=projectid))
+    def delete_group(self, groupid):
+        web.config.db.delete("groups", where="id=$u", vars=dict(u=groupid))
+        web.config.db.delete("group_users", where="groupid=$u", vars=dict(u=groupid))
         return "deleted"
 
     def delete_user(self, userid, usertype):

@@ -12,7 +12,7 @@ render = web.template.render(
     globals={'time':time, 'session':web.config.session, 'ctx':web.ctx})
 
 create_repo_form = form.Form(
-    form.Dropdown("owner", args=["Yourself", "Some Project"], description="Owner"),
+    form.Dropdown("owner", args=["Yourself", "Some Group"], description="Owner"),
     form.Textbox("name", description="Name"),
     form.Textbox("id", description="id"),
     form.Textarea("desc", description="Description"),
@@ -23,10 +23,10 @@ class create:
     @requires_login
     def GET(self):
         userid = web.config.session.userid
-        project_query = web.config.db.select('project_users', dict(u=userid), where="userid=$u", what="projectid")
-        projectids = [p.projectid for p in project_query]
-        projectids = [userid] + projectids
-        create_repo_form['owner'].args = projectids
+        group_query = web.config.db.select('group_users', dict(u=userid), where="userid=$u", what="groupid")
+        groupids = [g.groupid for g in group_query]
+        groupids = [userid] + groupids
+        create_repo_form['owner'].args = groupids
         return render.createRepo(create_repo_form)
 
     @requires_login
