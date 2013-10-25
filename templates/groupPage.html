@@ -1,0 +1,20 @@
+$def with(group, repos, members)
+
+<div class="hero-unit">
+	<h1>$group.name</h1>
+	<div>
+		$group.description
+	</div>
+</div>
+
+<h2>Repositories</h2>
+<ul>
+$for r in repos:
+	<li><a href="/$r.owner/$r.id">$r.name</a></li>
+</ul>
+
+<h2>Members</h2>
+<ul>
+$for m in members:
+	<li><a href="/$m.id">$m.name - $m.role</a></li>
+</ul>

@@ -1,0 +1,30 @@
+$def with(grouplist)
+
+<div>
+<h2>All public groups</h2>
+<table class="table table-hover table-striped">
+<thead>
+	<tr>
+		<th>Group name</th>
+		<th>Owner</th>
+		<th># members</th>
+		<th># repositories</th>
+		<th></th>
+	</tr>
+</thead>
+<tbody>
+$for g in grouplist:
+	<tr>
+		<td>$g.name</td>
+		<td>$g.owner</td>
+		<td>$g.num_users</td>
+		<td>$g.num_repos</td>
+		<td><a href="/$g.id">go to group</a></td>
+	</tr>
+	$if g.description != '':
+		<tr><td colspan=""5">$g.description</td></tr>
+</tbody>
+</table>
+
+</div>
+
