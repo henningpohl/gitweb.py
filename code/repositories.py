@@ -1,4 +1,5 @@
 import os
+import shutil
 import time
 import hashlib
 import git
@@ -83,11 +84,11 @@ class settings:
         if 'type' not in postvars:
             return web.badrequest("Invalid parameters")
 
-        d = dict(o=owner,i=repoId,u=postvars.userid)
+        d = dict(o=owner,i=repoId,u=postvars.get('userid', None))
         if postvars.type == 'user':
             if 'userid' not in postvars or 'access' not in postvars:
                 return web.badrequest("Invalid parameters")
-            if postvars.access not in ["read", "write", "admin"]:
+            if postvars.access not in ["read", "if os.path.exists(repoPath):write", "admin"]:
                 return web.internalerror("Invalid user right")
 
             web.config.db.insert('repo_users', repoid=repoId, repoowner=owner, userid=postvars.userid, access=postvars.access)
@@ -111,5 +112,23 @@ class settings:
                 return web.internalerror("Invalid user right")
 
             web.config.db.update('repo_users', where="repoid=$i and repoowner=$o and userid=$u", vars=d, access=postvars.access)
+        elif postvars.type == 'delete':
+            if postvars.confirm != "yes, I really want to delete this repository":
+                return web.seeother("/%s/%s/settings" % (owner, repoId))
+
+            repoPath = os.path.join("repositories", owner, repoId + ".git")
+            transaction = web.config.db.transaction()
+            try:
+                web.config.db.delete('repo_users', where="repoid=$i and repoowner=$o", vars=d)
+                web.config.db.delete('repositories', where="id=$i and owner=$o", vars=d)
+                if os.path.exists(repoPath):
+                    shutil.rmtree(repoPath, True)
+            except Exception, e:
+                transaction.rollback()
+                print e
+                return web.internalerror("Couldn't delete repository")
+            transaction.commit()
+            return web.seeother("/")
+
         return web.seeother("/%s/%s/settings" % (owner, repoId))
 

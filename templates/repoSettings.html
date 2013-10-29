@@ -33,6 +33,22 @@ $var for_head:
 			tempForm.append($$('<input type="text" name="access" value="admin"/>'));
 			tempForm.submit();
 		});
+		
+		function checkConfirmString(elem) {
+			if(elem.val() == "yes, I really want to delete this repository") {
+				elem.siblings(".confirmSubmit").attr("disabled", false);
+			} else {
+				elem.siblings(".confirmSubmit").attr("disabled", true);
+			}
+		}
+		
+		$$(".confirmText").keyup(function() {
+			checkConfirmString($$(this));
+		});
+		
+		$$(".confirmText").blur(function() {
+			checkConfirmString($$(this));
+		});
 	});
 	</script>
 
@@ -71,7 +87,7 @@ $var for_head:
 				</div>
 			</div>
 			<input type="hidden" name="type" value="info" />
-			<button class="btn btn-large btn-primary offset5" id="formSubmit" type="submit">Update Repository</button>
+			<button class="btn btn-large btn-primary offset5" type="submit">Update Repository</button>
 		</form>
 		
 		<h4>Manage collaborators</h4>
@@ -123,6 +139,17 @@ $var for_head:
 			</form>
 		</tfoot>
 		</table>
+		
+		<h4>Delete repository</h4>
+		<p>Deleting a repository removes all associated data from the server. Neither you or any of your collaborators will be able to access it afterwards. To confirm this step enter <strong>yes, I really want to delete this repository</strong> in the box below.</p>
+		
+		<form method="POST" class="form-inline offset2">
+			<input type="hidden" name="type" value="delete" />
+			<div class="input-append">
+				<input class="span16 confirmText" type="text" name="confirm" />
+				<button class="btn btn-danger confirmSubmit" type="submit" disabled>Delete Repository</button>
+			</div>
+		</form>
 	</div>
 	<div class="span3">
 		<ul class="nav nav-tabs nav-stacked">

@@ -61,6 +61,12 @@ BEGIN
 	INSERT INTO repo_users VALUES(NEW.id, NEW.owner, NEW.owner, "admin");
 END;
 
+/* Trigger to ensure all repository users are removed when a repository is deleted */
+CREATE TRIGGER repository_deletion BEFORE DELETE ON repositories 
+BEGIN 
+	DELETE FROM repo_users WHERE repoowner = OLD.owner AND repoid = OLD.id;
+END;
+
 /* Make group ids immutable */
 
 CREATE TRIGGER gid_change BEFORE UPDATE ON groups WHEN NEW.id != OLD.id
