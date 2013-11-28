@@ -1,55 +1,59 @@
-$def with(pagename, authmethods, form)
+<%!
+	import web
+%>
+<%page args="form"/>
+<%inherit file="main.html"/>
 
-$var for_head:
+<%block name="head">
 	<script src="/static/removeDiacritics.js"></script>
 	<script>
 
-	$$(document).ready(function(){
+	$(document).ready(function(){
 		function checkId() {
-			$$.get('/checkId?id=' + $$("#inputId").val(), function(data) {
+			$.get('/checkId?id=' + $("#inputId").val(), function(data) {
 				if(data == "true") {
-					$$(".control-group:has(#inputId)").removeClass("error");
-					$$('#inputIdError').hide();
+					$(".control-group:has(#inputId)").removeClass("error");
+					$('#inputIdError').hide();
 					return true;
 				} else {
-					$$(".control-group:has(#inputId)").addClass("error");
-					$$('#inputIdError').show();
+					$(".control-group:has(#inputId)").addClass("error");
+					$('#inputIdError').show();
 					return false;
 				}
 			});
 		}
 		
-		$$('#inputIdError').hide();
+		$('#inputIdError').hide();
 
-		$$("#inputName").keyup(function(event) {
-			$$("#inputId").val(makeIdString($$("#inputName").val()));	
+		$("#inputName").keyup(function(event) {
+			$("#inputId").val(makeIdString($("#inputName").val()));	
 			checkId();
 		});
 		
-		$$("#inputName").blur(function(event) {
-			$$("#inputId").val(makeIdString($$("#inputName").val()));	
+		$("#inputName").blur(function(event) {
+			$("#inputId").val(makeIdString($("#inputName").val()));	
 			checkId();
 		});
 		
-		$$("#inputId").change(function() {
+		$("#inputId").change(function() {
 			checkId();
 		});
 		
-		$$("#formSubmit").click(function(){
+		$("#formSubmit").click(function(){
 			var inputStates = [];
-			$$("#content").each(function(){
-				inputStates.push($$(this).val());
+			$("#content").each(function(){
+				inputStates.push($(this).val());
 			});		
 			if(jQuery.inArray("", inputStates) != -1) {
-				$$("#content").effect("shake", 500);
+				$("#content").effect("shake", 500);
 				return false; // some field is empty
 			}
 
-			$$.get('/checkId?id=' + $$("#inputId").val(), function(data) {
+			$.get('/checkId?id=' + $("#inputId").val(), function(data) {
 				if(data == "true") {
-					$$("#pickIdForm").submit()
+					$("#pickIdForm").submit()
 				} else {
-					$$("this").effect("shake", 500);
+					$("this").effect("shake", 500);
 					return false;
 				}
 			});
@@ -57,9 +61,10 @@ $var for_head:
 		});
 	});
 	</script>
+</%block>
 
 <div class="hero-unit">
-	<h1>$pagename</h1>
+	<h1>${web.config.pagename}</h1>
 	<p>Welcome to our source code repository management system. Please log to use the site. If you haven't used the site before, just register below. However, if you have an LDAP account with us, you can just use that one for logging in. No need to register!</p>
 	
 	<form action="/register" method="POST" class="form-horizontal">		
@@ -103,11 +108,12 @@ $var for_head:
 				<input type="password" id="inputPass2" name="password2" class="input-xlarge" placeholder="Repeat password" required>
 			</div>
 		</div>
-		
-		$if form.note:
+				
+		% if form.note:
 			<div class="alert alert-info">
-				$form.note
+				${form.note}
 			</div>
+		% endif
 		
 		<button class="btn btn-large btn-primary offset5" id="formSubmit" type="submit">Register</button>
 	</form>

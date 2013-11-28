@@ -5,12 +5,8 @@ import hashlib
 import git
 import web
 from web import form
+from common import *
 from decorators import requires_login, requires_repo_admin
-
-render = web.template.render(
-    'templates/',
-    base='main',
-    globals={'time':time, 'session':web.config.session, 'ctx':web.ctx})
 
 create_repo_form = form.Form(
     form.Dropdown("owner", args=["Yourself", "Some Group"], description="Owner"),
@@ -23,18 +19,20 @@ create_repo_form = form.Form(
 class create:
     @requires_login
     def GET(self):
+        web.header('Content-Type', 'text/html')
         userid = web.config.session.userid
         group_query = web.config.db.select('group_users', dict(u=userid), where="userid=$u", what="groupid")
         groupids = [g.groupid for g in group_query]
         groupids = [userid] + groupids
         create_repo_form['owner'].args = groupids
-        return render.createRepo(create_repo_form)
+        return render.createRepo(form=create_repo_form)
 
     @requires_login
     def POST(self):
+        web.header('Content-Type', 'text/html')
         f = create_repo_form()
         if not f.validates():
-            return render.createRepo(f)
+            return render.createRepo(form=f)
 
         v = dict(o=f.d.owner, i=f.d.id)
         u = web.config.db.select('repositories', v, where="id=$i and owner=$o", what="id").list()
@@ -49,36 +47,43 @@ class create:
         web.config.db.query("pragma foreign_keys=ON") # making sure constraints are enforced
         transaction = web.config.db.transaction()
         try:
-            print f.d
             web.config.db.insert('repositories', id=f.d.id, name=f.d.name, owner=f.d.owner, description=f.d.desc, access=f.d.access)
             # A trigger adds rights to repo_users at this point
+            os.makedirs(repoPath, 0775)
             git.Repo.init(repoPath, bare=True, shared="group")
             transaction.commit()
             return web.seeother("/%s/%s" % (f.d.owner, f.d.id))
         except Exception, e:
             transaction.rollback()
-            print e
+            print "Exception on repository creation:", e
             return web.internalerror("Couldn't create repository")
 
 class settings:
     @requires_login
     @requires_repo_admin
     def GET(self, owner, repoId):
+        web.header('Content-Type', 'text/html')
         d = dict(o=owner,i=repoId,u=web.config.session.userid)
         repoInfo = web.config.db.select('repositories', d, where="id=$i and owner=$o", what="description,access,name").list()
         if len(repoInfo) != 1:
             return web.internalerror("Invalid repository")
+
+        repoInfo = repoInfo[0]
+        curUserRights = web.config.db.select('repo_users', d, where="repoid=$i and repoowner=$o and userid=$u", what="access").list()
+        if len(curUserRights) == 1 and curUserRights[0].access == "admin":
+            repoInfo.userLevel = "admin"
 
         collaborators = web.config.db.select('repo_users', d, where="repoid=$i and repoowner=$o", what="userid,access").list()
         cids = [c.userid for c in collaborators]
         users = web.config.db.select('users', what='id,name').list()
         users = [u for u in users if u.id not in cids]
         
-        return render.repoSettings(owner, repoId, repoInfo[0], collaborators, users)
+        return render.showRepoSettings(owner=owner, repoid=repoId, repoInfo=repoInfo, collaborators=collaborators, users=users)
 
     @requires_login
     @requires_repo_admin
     def POST(self, owner, repoId):
+        web.header('Content-Type', 'text/html')
         postvars = web.input()
         
         if 'type' not in postvars:

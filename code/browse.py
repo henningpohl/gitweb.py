@@ -7,67 +7,64 @@ from pygments.formatters import HtmlFormatter
 from git import *
 import web
 from web import form
-from decorators import requires_login
+from common import *
+import queries
+from decorators import requires_login, requires_repo_access
 from util import find
 import gitHelper
-
-render = web.template.render(
-    'templates/',
-    base='main',
-    globals={'time':time, 'session':web.config.session, 'ctx':web.ctx})
 
 class owner:
     @requires_login
     def GET(self, owner):
+        web.header('Content-Type', 'text/html')
         userinfo = web.config.db.select("owners", dict(u=owner), where="id=$u").list()
         if len(userinfo) != 1:
             raise web.notfound()
 
         if userinfo[0].type == "group":
             return self.GET_group(owner)
-        else:
+        elif userinfo[0].type in ["ldapuser", "localuser"]:
             return self.GET_user(owner)
+        else:
+            raise web.internalerror("Unexpected user type")
         
     def GET_group(self, owner):
         groupinfo = web.config.db.select("groups", dict(u=owner), where="id=$u").list()
         if len(groupinfo) != 1:
             return web.internalerror("Couldn't find user information")
         
-        repoquery = web.config.db.query(
-            """SELECT repositories.id, repositories.owner, repositories.name
-               FROM repo_users INNER JOIN repositories
-               ON repo_users.repoid = repositories.id
-               WHERE repo_users.userid = $u""", vars=dict(u=owner))
+        repos = queries.repos_for_owner(owner).list()
+        for r in repos:
+            repo = Repo(os.path.join(web.config.reporoot, r.owner, r.id + ".git"))
+            r.lastUpdate = gitHelper.get_last_commit_time(repo)
+        
+        members = queries.members_for_group(owner).list()
 
-        memberquery = web.config.db.query(
-            """SELECT users.id AS id, group_users.role AS role, users.name AS name
-               FROM group_users INNER JOIN users
-               ON group_users.userid = users.id
-               WHERE group_users.groupid = $u""", vars=dict(u=owner))
-
-        return render.groupPage(groupinfo[0], repoquery, memberquery)   
+        return render.groupPage(group=groupinfo[0], repos=repos, members=members)   
 
     def GET_user(self, owner):
         userinfo = web.config.db.select("users", dict(u=owner), where="id=$u").list()
         if len(userinfo) != 1:
             return web.internalerror("Couldn't find user information")
-        
-        repoquery = web.config.db.query(
-            """SELECT repositories.id, repositories.owner, repositories.name FROM repo_users
-               INNER JOIN repositories
-               ON repo_users.repoid = repositories.id
-               WHERE repo_users.userid = $u""", vars=dict(u=owner))
 
-        groupquery = web.config.db.query(
-            """SELECT group_users.groupid AS id, groups.name AS name
-               FROM group_users INNER JOIN groups
-               ON group_users.groupid = groups.id
-               WHERE group_users.userid = $u""", vars=dict(u=owner))
+        userinfo = userinfo[0]
+        auth = [m for m in web.config.auth.methods if m.get_usertype() == userinfo.type][0]
+        userinfo.joined = auth.get_join_date(owner, web.config)
 
-        return render.userPage(userinfo[0], repoquery, groupquery)   
+        repos = queries.repos_for_user(owner).list()
+        for r in repos:
+            repo = Repo(os.path.join(web.config.reporoot, r.owner, r.id + ".git"))
+            r.lastUpdate = gitHelper.get_last_commit_time(repo)
+
+        groups = queries.groups_with_membership_for_user(owner).list()
+
+        return render.userPage(user=userinfo, repos=repos, groups=groups)   
 
 class repositoryHome:
+    @requires_login
+    @requires_repo_access
     def GET(self, owner, repoId):
+        web.header('Content-Type', 'text/html')
         d = dict(o=owner,i=repoId,u=web.config.session.userid)
         repoInfo = web.config.db.select('repositories', d, where="id=$i and owner=$o", what="description,access,name").list()
         if len(repoInfo) != 1:
@@ -80,17 +77,20 @@ class repositoryHome:
         
         repo = Repo(os.path.join(web.config.reporoot, owner, repoId + ".git"))
         if 'master' not in repo.heads:
-            return render.showRepoFiles(owner, repoId, repoInfo, [])
+            return render.showRepoFiles(owner=owner, repoid=repoId, repoInfo=repoInfo, path="", filelist=[])
         
         tree = repo.heads.master.commit.tree
         curHashes = [entry.hexsha for entry in tree]
         changeinfo = gitHelper.get_last_updating_commit(repo, 'master', curHashes)
         filelist = [(entry, changeinfo[entry.hexsha]) for entry in tree]
         
-        return render.showRepoFiles(owner, repoId, repoInfo, filelist)
+        return render.showRepoFiles(owner=owner, repoid=repoId, repoInfo=repoInfo, path="", filelist=filelist)
 
 class repositoryCommits:
+    @requires_login
+    @requires_repo_access
     def GET(self, owner, repoId, branch):
+        web.header('Content-Type', 'text/html')
         d = dict(o=owner,i=repoId,u=web.config.session.userid)
         repoInfo = web.config.db.select('repositories', d, where="id=$i and owner=$o", what="description,access,name").list()
         if len(repoInfo) != 1:
@@ -104,7 +104,7 @@ class repositoryCommits:
         repo = Repo(os.path.join(web.config.reporoot, owner, repoId + ".git"))
         commits = repo.iter_commits('master', max_count=20)
        
-        return render.showRepoCommits(owner, repoId, repoInfo, commits)
+        return render.showRepoCommits(owner=owner, repoid=repoId, repoInfo=repoInfo, commits=commits)
 
 def path_parts(path):
     parts = []
@@ -120,8 +120,11 @@ class repositoryShowFile:
             if entry.path == filepath:
                 return entry
         return None
-    
+
+    @requires_login
+    @requires_repo_access
     def GET(self, owner, repoId, branch, filepath):
+        web.header('Content-Type', 'text/html')
         repo = Repo(os.path.join(web.config.reporoot, owner, repoId + ".git"))
 
         curnode = repo.heads.master.commit.tree
@@ -142,12 +145,24 @@ class repositoryShowFile:
             .codetable pre { border:0px; }
             %s
             """ % style
-        code = highlight(curnode.data_stream.read(), lexer, formatter)
+
+        rawcontent = curnode.data_stream.read()
+        content = highlight(rawcontent, lexer, formatter)       
+
+        fileinfo = {
+            'path': filepath,
+            'name': os.path.basename(filepath),
+            'extension': os.path.splitext(filepath)[1],
+            'size': curnode.size,
+            'lines': rawcontent.count('\n')}
         
-        return render.showFile(owner, repoId, filepath, style, code)
+        return render.showFile(owner=owner, repoid=repoId, file=fileinfo, style=style, content=content)
             
 class repositoryShowDirectory:
+    @requires_login
+    @requires_repo_access
     def GET(self, owner, repoId, branch, dirpath):
+        web.header('Content-Type', 'text/html')
         d = dict(o=owner,i=repoId,u=web.config.session.userid)
         repoInfo = web.config.db.select('repositories', d, where="id=$i and owner=$o", what="description,access,name").list()
         if len(repoInfo) != 1:
@@ -166,6 +181,6 @@ class repositoryShowDirectory:
         changeinfo = gitHelper.get_last_updating_commit(repo, 'master', curHashes)
         filelist = [(entry, changeinfo[entry.hexsha]) for entry in curnode]
        
-        return render.showRepoFiles(owner, repoId, repoInfo, filelist)
+        return render.showRepoFiles(owner=owner, repoid=repoId, repoInfo=repoInfo, path=dirpath, filelist=filelist)
 
 

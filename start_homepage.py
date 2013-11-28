@@ -18,6 +18,9 @@ if 'inet_pton' not in socket.__all__:
         raise socket.error
     socket.inet_pton = inet_pton
 
+# http://stackoverflow.com/questions/3657732/how-to-import-the-python-async-module-from-a-worker-thread
+import async
+
 import time
 import web
 
@@ -38,7 +41,7 @@ urls = (
   '/([\w\-]+)',                               'browse.owner',
   '/([\w\-]+)/([\w\-]+)/commits/([\w\-]+)',   'browse.repositoryCommits',
   '/([\w\-]+)/([\w\-]+)/blob/([\w\-]+)/(.+)', 'browse.repositoryShowFile',
-  '/([\w\-]+)/([\w\-]+)/tree/([\w\-]+)/(.+)', 'browse.repositoryShowDirectory',
+  '/([\w\-]+)/([\w\-]+)/tree/([\w\-]+)/(.*)', 'browse.repositoryShowDirectory',
   '/([\w\-]+)/([\w\-]+)/settings',            'repositories.settings',
   '/([\w\-]+)/([\w\-]+)',                     'browse.repositoryHome',  
 )

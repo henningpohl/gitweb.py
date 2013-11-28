@@ -1,60 +1,76 @@
-$def with(form)
+<%!
+	import web
+%>
+<%page args="form"/>
+<%inherit file="main.html"/>
 
-$var for_head:
+<%block name="head">
 	<script src="/static/removeDiacritics.js"></script>
 	<script>
-	$$(document).ready(function(){
-		$$('#inputNameError').hide();
+	$(document).ready(function(){
+		$('#inputNameError').hide();
 		
-		var id_popover = $$("#inputName").popover({
+		var id_popover = $("#inputName").popover({
 			trigger: "manual",
 			placement: "right",
 			content: ""
 		});
-
+		
 		function updateId() {
-			idStr = makeIdString($$("#inputName").val());
-			$$("#inputId").val(idStr);
+			idStr = makeIdString($("#inputName").val());
+			$("#inputId").val(idStr);
 			
-			if(idStr == $$("#inputName").val()) {
-				$$("#inputName").popover('hide');
+			if(idStr == $("#inputName").val()) {
+				$("#inputName").popover('hide');
 			} else {
 				id_popover.data("popover").options.content = "Will be created as: " + idStr;
-				$$("#inputName").popover('show');
+				$("#inputName").popover('show');
 			}
 			
-			$$.get('/checkRepo?id=' + $$("#inputOwner").val() + '&repo=' + idStr, function(data) {
+			if(idStr.length < 3) {
+				$('#formSubmit').attr("disabled", "disabled");
+				return;
+			} else {
+				$('#formSubmit').removeAttr("disabled");
+			}
+						
+			$.get('/checkRepo?id=' + $("#inputOwner").val() + '&repo=' + idStr, function(data) {
 				if(data == "true") {
-					$$(".control-group:has(#inputId)").removeClass("error");
-					$$('#inputNameError').hide();
+					$(".control-group:has(#inputId)").removeClass("error");
+					$('#inputNameError').hide();
+					$('#formSubmit').removeAttr("disabled");    
 				} else {
-					$$(".control-group:has(#inputId)").addClass("error");
-					$$('#inputNameError').show();
+					$(".control-group:has(#inputId)").addClass("error");
+					$('#inputNameError').show();
+					$('#formSubmit').attr("disabled", "disabled");
 				}
 			});
 		}
 		
-		$$("#inputName").keyup(function(event) {
+		$("#inputName").keyup(function(event) {
 			updateId();
 		});
 		
-		$$("#inputName").blur(function(event) {
+		$("#inputName").blur(function(event) {
 			updateId();
 		});
 			
-		$$("#formSubmit").click(function(){
-			$$.get('/checkRepo?id=' + $$("#inputId").val() + '&repo=' + "oops", function(data) {
+		$("#formSubmit").click(function(){		
+			$.get('/checkRepo?id=' + $("#inputId").val() + '&repo=' + "oops", function(data) {
 				if(data == "true") {
-					$$("#createRepoForm").submit()
+					$("#createRepoForm").submit()
 				} else {
-					$$("this").effect("shake", 500);
+					$("this").effect("shake", 500);
 					return false;
 				}
 			});
 			return false;
 		});
+		
+		updateId();
 	});
 	</script>
+</%block>
 
 <h2>Create new repository</h2>
 <form method="POST" class="form-horizontal" id="createRepoForm">
@@ -62,8 +78,9 @@ $var for_head:
 		<label class="control-label" for="inputOwner">Owner</label>
 		<div class="controls">
 			<select id="inputOwner" name="owner" class="input-xlarge">
-			$for available_owner in form.owner.args:
-				<option value="$available_owner">$available_owner</option>
+			% for available_owner in form.owner.args:
+				<option value="${available_owner}">${available_owner}</option>
+			% endfor
 			</select>
 		</div>
 	</div>
@@ -100,10 +117,11 @@ $var for_head:
 		</div>
 	</div>
 	
-	$if form.note:
+	% if form.note:
 		<div class="alert alert-info">
 			$form.note
 		</div>
+	% endif
 	
 	<button class="btn btn-large btn-primary offset5" id="formSubmit" type="submit">Create Repository</button>
 

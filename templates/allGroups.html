@@ -1,8 +1,12 @@
-$def with(grouplist)
+<%!
+	import web
+%>
+<%page args="groups"/>
+<%inherit file="main.html"/>
 
 <div>
 <h2>All public groups</h2>
-<table class="table table-hover table-striped">
+<table class="table table-bordered table-condensed">
 <thead>
 	<tr>
 		<th>Group name</th>
@@ -13,18 +17,18 @@ $def with(grouplist)
 	</tr>
 </thead>
 <tbody>
-$for g in grouplist:
+% for g in groups:
 	<tr>
-		<td>$g.name</td>
-		<td>$g.owner</td>
-		<td>$g.num_users</td>
-		<td>$g.num_repos</td>
-		<td><a href="/$g.id">go to group</a></td>
+		<td>${g.name}</td>
+		<td>${g.owner}</td>
+		<td>${g.num_users}</td>
+		<td>${g.num_repos}</td>
+		<td><a href="/${g.id}">go to group</a></td>
 	</tr>
-	$if g.description != '':
-		<tr><td colspan=""5">$g.description</td></tr>
+	% if g.description != '':
+		<tr><td colspan="5">${g.description}</td></tr>
+	% endif
+% endfor
 </tbody>
 </table>
-
 </div>
-

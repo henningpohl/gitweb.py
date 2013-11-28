@@ -17,6 +17,7 @@ class adminPanel:
     @requires_admin
     @requires_login
     def GET(self):
+        web.header('Content-Type', 'text/html')
         userlist = web.config.db.select("users").list()
         for u in userlist:
             auth = [m for m in web.config.auth.methods if m.get_usertype() == u.type][0]
@@ -37,6 +38,7 @@ class adminPanel:
     @requires_admin
     @requires_login  
     def POST(self):
+        web.header('Content-Type', 'text/plain')
         web.header('Cache-control', 'no-cache')        
         cmd = web.input()
         if cmd.action == "deleteRepo":

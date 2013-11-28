@@ -1,0 +1,35 @@
+<%!
+	import web
+%>
+<%inherit file="main.html"/>
+
+<div class="page-header">
+	<h1><i class="fa fa-book"></i> ${repoInfo.name} <small>${repoInfo.access}</small> <small style="margin-left:20px;"><a href="/${owner}">${owner}</a> / <a href="/${owner}/${repoid}">${repoid}</a></small></h1>
+	<p>${repoInfo.description} \
+	% if 'userLevel' in repoInfo and repoInfo.userLevel == 'admin':
+		&mdash; <a href="/${owner}/${repoid}/settings">edit description</a> \
+	% endif
+	</p>
+</div>
+
+<div class="container-fluid">
+	<div class="row">
+		<ul class="nav nav-pills pull-left">
+			<li <%block name="filesActive"/>><a href="/${owner}/${repoid}">Files</a></li>
+			<li <%block name="commitsActive"/>><a href="/${owner}/${repoid}/commits/master">Commits</a></li>
+			##<li <%block name="branchesActive"/>><a href="#" data-toggle="tab">Branches</a></li>
+			% if 'userLevel' in repoInfo and repoInfo.userLevel == 'admin':
+				<li <%block name="settingsActive"/>><a href="/${owner}/${repoid}/settings">Settings</a></li>
+			% endif
+		</ul>
+		<div class="input-prepend input-append pull-right">
+			<input class="repoUrl span5" type="text" value="https://${web.ctx.host}/${owner}/${repoid}.git">
+			<button class="btn repoUrlButton" type="button" data-clipboard-text="https://${web.ctx.host}/${owner}/${repoid}.git" title="copy to clipboard"><i class="fa fa-clipboard"></i></button>
+			<script type="text/javascript">
+				var clip = new ZeroClipboard($(".repoUrlButton"), {moviePath: "/static/ZeroClipboard.swf"});
+			</script>
+		</div>
+	</div>
+</div>
+
+${next.body(**pageargs)}

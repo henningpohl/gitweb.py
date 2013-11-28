@@ -1,30 +1,49 @@
-$def with(owner, repoid, filename, style, filecontent)
+<%!
+	import web
+%>
+<%page args="owner, repoid, file, style, content"/>
+<%inherit file="main.html"/>
 
-$var for_head:
-	<style type="text/css">
-		$style
-	</style>
+<%block name="head">
+<style type="text/css">
+	${style}
+</style>
+</%block>
 
 <div>
-	<h2>$repoid</h2>
+	<h2>${repoid}</h2>
 	<div class="input-prepend input-append">
 		<span class="add-on">HTTPS</span>
-		<input class="span5" id="prependedInput" type="text" value="https://$(ctx.host)/$(owner)/$(repoid).git">
+		<input class="span5" id="prependedInput" type="text" value="https://${web.ctx.host}/${owner}/${repoid}.git">
 		<button class="btn" type="button"><i class="icon-share-alt"></i></button>
 	</div>
 </div>
 
 <ul class="nav nav-pills">
-	<li><a href="/$owner/$repoid">Files</a></li>
-	<li><a href="/$owner/$repoid/commits/master">Commits</a></li>
-	$#<li><a href="#" data-toggle="tab">Branches</a></li>
+	<li><a href="/${owner}/${repoid}">Files</a></li>
+	<li><a href="/${owner}/${repoid}/commits/master">Commits</a></li>
+	##<li><a href="#" data-toggle="tab">Branches</a></li>
 </ul>
 
-<div>
-<h2>$filename</h2>
-<pre class="brush: $filename.rpartition('.')[-1]">
-$:filecontent
-</pre>
-
+<div class="span12 showfile">
+	<div class="navbar">
+		<div class="navbar-inner">
+			<p class="navbar-text pull-left">
+				<i class="fa fa-file-text-o"></i>
+				<span class="showfileheader">${file['name']}</span>
+				<span class="showfileheader">${file['lines']} lines</span>
+				<span class="showfileheader">${file['size']} bytes</span>
+			</p>
+			<div class="navbar-text input-append input-prepend pull-right">
+				<button class="btn btn-small" type="button">edit</button>
+				<button class="btn btn-small" type="button">raw</button>
+				<button class="btn btn-small" type="button">blame</button>
+				<button class="btn btn-small" type="button">history</button>
+				<button class="btn btn-small btn-danger" type="button">remove</button>
+			</div>
+		</div>
+	</div>
+	<div class="filecontent">
+		${content}
+	</div>
 </div>
-

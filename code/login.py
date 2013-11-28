@@ -1,15 +1,8 @@
 import os
-import hashlib
-import time
-import ldap
 import web
 from web import form
 from auth import RequireRegistrationException
-
-render = web.template.render(
-    'templates/',
-    base='main',
-    globals={'time':time, 'session':web.config.session})
+from common import *
 
 login_form = form.Form(
     form.Textbox("username", description="Username or Email"),
@@ -19,6 +12,7 @@ login_form = form.Form(
 
 class login:
     def POST(self):
+        web.header('Content-Type', 'text/html')
         f = login_form()
         if not f.validates():
             raise web.seeother('/')
@@ -47,6 +41,7 @@ class login:
 
 class logout:
     def GET(self):
+        web.header('Content-Type', 'text/html')
         web.config.session.loggedin = False
         if 'userid' in web.config.session:
             del web.config.session.userid

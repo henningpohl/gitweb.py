@@ -29,3 +29,10 @@ def requires_repo_admin(func):
         else:
             return func(*args, **kwargs)
     return wrapped
+
+def requires_repo_access(func):
+    def wrapped(*args, **kwargs):
+        # TODO: Write 
+        return func(*args, **kwargs)
+    return wrapped
+        

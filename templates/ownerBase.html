@@ -1,0 +1,19 @@
+<%!
+	import web
+%>
+<%inherit file="main.html"/>
+<%namespace name="common" file="common.html"/>
+
+<div class="hero-unit">
+	<div class="row">
+		<div class="span2">
+			<h1><i class="fa <%block name="icon" /> fa-2x"></i></h1>
+		</div>
+		<div class="span6 offset1">
+			<h1><%block name="owner" /></h1>
+			<h3><%block name="tagline" /></h3>
+		</div>
+	</div>
+</div>
+
+${next.body(**pageargs)}

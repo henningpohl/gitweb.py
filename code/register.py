@@ -4,12 +4,8 @@ import hashlib
 import web
 from web import form
 from decorators import requires_login
+from common import *
 from util import make_id_string, check_id
-
-render = web.template.render(
-    'templates/',
-    base='main',
-    globals={'time':time, 'session':web.config.session})
 
 vpass = form.regexp(r".{3,}$", 'must be at least 3 characters long')
 vemail = form.regexp(r".*@.*", "must be a valid email address")
@@ -37,6 +33,7 @@ ldap_register_form = form.Form(
 
 class register:
     def GET(self):
+        web.header('Content-Type', 'text/html')
         if 'showIdentifierRegistration' not in web.config.session:
             raise web.seeother('/')
 
@@ -45,9 +42,10 @@ class register:
         f.fullname.value = web.config.session.userfullname
         f.id.value = make_id_string(web.config.session.userfullname)
 
-        return render.ldapRegistration(f)
+        return render.ldapRegistration(form=f)
 
-    def POST(self):        
+    def POST(self):  
+        web.header('Content-Type', 'text/html')	
         if 'email' in web.input():
             return self.local_registration()
         else:
@@ -56,7 +54,7 @@ class register:
     def ldap_registration(self):       
         f = ldap_register_form()        
         if not f.validates():
-            return render.ldapRegistration(f)
+            return render.ldapRegistration(form=f)
 
         auth = [m for m in web.config.auth.methods if m.get_usertype() == 'ldapuser'][0]
         web.config.db.insert('ldapusers', id=f.d.id, username=f.d.username, name=f.d.fullname)
@@ -69,12 +67,12 @@ class register:
     def local_registration(self):    
         f = register_form()
         if not f.validates():
-            return render.welcomePage(f)
+            return render.welcomePage(form=f)
         else:
             u = web.config.db.select('localusers', dict(u=f.d.email, i=f.d.id), where="email=$u or id=$i", what="id").list()
             if len(u) is not 0:
                 f.note = "There's already an account for your email address or identifier"
-                return render.welcomePage(f)
+                return render.welcomePage(form=f)
 
             pwhash = hashlib.sha256(web.config.salt + f.d.password).hexdigest()
             web.config.db.insert('localusers', id=f.d.id, name=f.d.name, email=f.d.email, password=pwhash)

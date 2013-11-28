@@ -1,4 +1,5 @@
 import hashlib
+import datetime
 import ldap
 
 class RequireRegistrationException(Exception):
@@ -22,6 +23,9 @@ class Auth(object):
     def get_rights(self, uid, config):
         return 'none'
 
+    def get_join_date(self, uid, config):
+        raise NotImplementedError
+
     def get_usertype(self):
         raise NotImplementedError
 
@@ -36,7 +40,8 @@ class LocalAuth(Auth):
 	    return True, {
 		'userid' : u[0].id, 
 		'userfullname' : u[0].name, 
-		'rights' : self.get_rights(u[0].id, config)
+		'rights' : self.get_rights(u[0].id, config),
+                'joined' : self.get_join_date(username, config)
 	    }
 	return False, {}
 		
@@ -49,6 +54,9 @@ class LocalAuth(Auth):
 	    return rights[0]
 	else:
 	    return "member"
+
+    def get_join_date(self, uid, config):
+        raise NotImplementedError
 
     def get_usertype(self):
         return "localuser"
@@ -72,7 +80,8 @@ class LdapAuth(Auth):
             return True, {
                 'userid' : u[0].id, 
                 'userfullname' : u[0].name, 
-                'rights' : self.get_rights(username, config)
+                'rights' : self.get_rights(username, config),
+                'joined' : self.get_join_date(username, config)
             }
                 
         except ldap.INVALID_CREDENTIALS:
@@ -80,7 +89,8 @@ class LdapAuth(Auth):
         except ldap.LDAPError, error_message:
             print "LDAP error: ", error_message
         return False, {}
-
+    def get_join_date(self, uid, config):
+        raise NotImplementedError
     def can_handle_user(self, username):
 	return "@" not in username
 
@@ -105,5 +115,19 @@ class LdapAuth(Auth):
             
         return 'none'
 
+    def get_join_date(self, uid, config):
+        try:
+            l = ldap.initialize(config.auth.ldapserver)
+            l.protocol_version = ldap.VERSION3
+
+            dn, timestamp = l.search_s(config.auth.ldapbasedn, ldap.SCOPE_SUBTREE, "uid=%s" % uid, ["createTimestamp"])[0]
+            timestamp = "".join(c for c in timestamp["createTimestamp"][0] if c.isdigit())
+            return datetime.datetime.strptime(timestamp, "%Y%m%d%H%M%S")
+        except ldap.LDAPError, error_message:
+            print "LDAP error: ", error_message
+
+        return None
+
     def get_usertype(self):
         return "ldapuser"
+

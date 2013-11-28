@@ -1,4 +1,6 @@
-﻿$def with (page)
+﻿<%!
+	import web
+%>
 <!doctype html>
 <html>
 <head>
@@ -6,23 +8,16 @@
 <title>GitWeb.py</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="shortcut icon" href="/static/favicon.ico" />
-<!--<link href="/static/reset.css" rel="stylesheet" type="text/css">
-<link href="/static/style.css" rel="stylesheet" type="text/css">//-->
 <link href="/static/bootstrap.min.css" rel="stylesheet" media="screen">
 <link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.1/css/font-awesome.css" rel="stylesheet">
+<link href='http://fonts.googleapis.com/css?family=Roboto:400,500,900italic,900,700italic,700,300,300italic,400italic,500italic' rel='stylesheet' type='text/css'>
+<link href="/static/style.css" rel="stylesheet" type="text/css">
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
 <script type="text/javascript" src="http://code.jquery.com/ui/1.10.1/jquery-ui.js"></script>
 <script type="text/javascript" src="/static/bootstrap.min.js"></script>
 <script type="text/javascript" src="/static/commoncode.js"></script>
 <script type="text/javascript" src="/static/ZeroClipboard.min.js"></script>
-$if 'for_head' in page:
-	$:page.for_head
-<style type="text/css">
-  body {
-	padding-top: 60px;
-	padding-bottom: 40px;
-  }
-</style>
+<%block name="head" />
 </head>
 
 <body>
@@ -30,37 +25,37 @@ $if 'for_head' in page:
 <div class="navbar navbar-inverse navbar-fixed-top">
 	<div class="navbar-inner">
 		<div class="container">
-			<a class="brand" href="/"><img src="/static/logo.png" style="height:23px;" /></a>
-			$if session.loggedin:
-				<ul class="nav">
-					<li><a href="/newRepository"><i class="icon-plus icon-white"></i> Create Repository</a></li>
-					<li><a href="/newGroup"><i class="icon-plus icon-white"></i> Create Group</a></li>
-				</ul>
+			<a class="brand" href="/">${web.config.pagename}</a>
+			% if web.config.session.loggedin:
+				<form class="navbar-search">
+					<input type="text" class="search-query" placeholder="Search (not working yet)">
+				</form>
 				<ul class="nav pull-right">
-					<li><a href="/$session.userid"><i class="icon-user icon-white"></i> $session.userfullname</a></li>
-					<li><a href="/settings"><i class="icon-cog icon-white"></i> Settings</a></li>
-					$if 'userrights' in session and session.userrights == 'admin':
-						<li><a href="/adminPanel"><i class="icon-briefcase icon-white"></i> Admin Panel</a></li>
-					<li><a href="/logout"><i class="icon-off icon-white"></i> Sign out</a></li>
+					<li><a href="/${web.config.session.userid}"><i class="fa fa-user"></i> ${web.config.session.userfullname}</a></li>
+					<li><a href="/newRepository" data-toggle="tooltip" data-placement="bottom" title="Create new repository"><i class="fa fa-plus-circle"></i> <i class="fa fa-book"></i></a></li>
+					<li><a href="/newGroup" data-toggle="tooltip" data-placement="bottom" title="Create new group"><i class="fa fa-plus-circle"></i> <i class="fa fa-group"></i></a></li>
+					<li><a href="/settings" data-toggle="tooltip" data-placement="bottom" title="Settings"><i class="fa fa-cog"></i></a></li>
+				% if 'userrights' in web.config.session and web.config.session.userrights == 'admin':
+					<li><a href="/adminPanel" data-toggle="tooltip" data-placement="bottom" title="Admin panel"><i class="fa fa-briefcase"></i></a></li>
+				% endif		
+					<li><a href="/logout" data-toggle="tooltip" data-placement="bottom" title="Sign out"><i class="fa fa-sign-out"></i></a></li>
 				</ul>
-			$else:
+			% else:
 				<form class="navbar-form pull-right" action="/login" method="POST" >
 					<input class="span3" name="username" type="text" placeholder="Email or ldap username">
 					<input class="span2" name="password" type="password" placeholder="Password">
-					<button type="submit" class="btn">Sign in</button>
+					<button type="submit" class="btn btn-inverse">Sign in</button>
 				</form>
+			% endif
 		</div>
 	</div>
 </div>
 
-
-
 <div class="container">
-  $:page
-
+  ${next.body(**pageargs)}
   <hr>
   <footer>
-	<p>&copy; gitweb.py 2013</p>
+    <p>&copy; gitweb.py 2013</p>
   </footer>
 </div>
 

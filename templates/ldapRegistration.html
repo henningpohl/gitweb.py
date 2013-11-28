@@ -1,35 +1,39 @@
-$def with(form)
+<%!
+	import web
+%>
+<%page args="form"/>
+<%inherit file="main.html"/>
 
-$var for_head:
+<%block name="head">
 	<script src="/static/removeDiacritics.js"></script>
 	<script>
-	$$(document).ready(function(){
+	$(document).ready(function(){
 		function checkId() {
-			$$.get('/checkId?id=' + $$("#inputId").val(), function(data) {
+			$.get('/checkId?id=' + $("#inputId").val(), function(data) {
 				if(data == "true") {
-					$$(".control-group:has(#inputId)").removeClass("error");
-					$$('#inputIdError').hide();
+					$(".control-group:has(#inputId)").removeClass("error");
+					$('#inputIdError').hide();
 					return true;
 				} else {
-					$$(".control-group:has(#inputId)").addClass("error");
-					$$('#inputIdError').show();
+					$(".control-group:has(#inputId)").addClass("error");
+					$('#inputIdError').show();
 					return false;
 				}
 			});
 		}
 		
-		$$('#inputIdError').hide();
+		$('#inputIdError').hide();
 		
-		$$("#inputId").change(function() {
+		$("#inputId").change(function() {
 			checkId();
 		});
 		
-		$$("#formSubmit").click(function(){
-			$$.get('/checkId?id=' + $$("#inputId").val(), function(data) {
+		$("#formSubmit").click(function(){
+			$$.get('/checkId?id=' + $("#inputId").val(), function(data) {
 				if(data == "true") {
-					$$("#pickIdForm").submit()
+					$("#pickIdForm").submit()
 				} else {
-					$$("this").effect("shake", 500);
+					$("this").effect("shake", 500);
 					return false;
 				}
 			});
@@ -37,6 +41,7 @@ $var for_head:
 		});
 	});
 	</script>
+</%block>
 
 <div class="hero-unit">
 	<h2>LDAP registration</h2>
@@ -46,21 +51,21 @@ $var for_head:
 		<div class="control-group">
 			<label class="control-label" for="inputName">Username</label>
 			<div class="controls">
-				<input type="text" name="username" class="input-xlarge" value="$form.username.value" readonly>
+				<input type="text" name="username" class="input-xlarge" value="${form.username.value}" readonly>
 			</div>
 		</div>
 	
 		<div class="control-group">
 			<label class="control-label" for="inputName">Name</label>
 			<div class="controls">
-				<input type="text" name="fullname" class="input-xlarge" value="$form.fullname.value" readonly>
+				<input type="text" name="fullname" class="input-xlarge" value="${form.fullname.value}" readonly>
 			</div>
 		</div>
 		
 		<div class="control-group">
 			<label class="control-label" for="inputId">Identifier</label>
 			<div class="controls">
-				<input type="text" id="inputId" name="id" class="input-xlarge" value="$form.id.value">
+				<input type="text" id="inputId" name="id" class="input-xlarge" value="${form.id.value}">
 			</div>
 		</div>
 		
@@ -68,11 +73,11 @@ $var for_head:
 			Unfortunately, this identifier is already in use
 		</div>
 			
-		$if form.note:
+		% if form.note:
 			<div class="alert alert-info">
-				$form.note
+				${form.note}
 			</div>
-		
+		% endif
 		<button class="btn btn-large btn-primary offset5" id="formSubmit" type="submit">Pick Identifier</button>
 	</form>
 </div>

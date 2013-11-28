@@ -7,20 +7,15 @@ from pygments.formatters import HtmlFormatter
 from git import *
 import web
 from web import form
+from common import *
 from decorators import requires_login
 from util import find
-import gitHelper
-
-render = web.template.render(
-    'templates/',
-    base='main',
-    globals={'time':time, 'session':web.config.session, 'ctx':web.ctx})
-
- 
+import gitHelper 
 
 class allGroups:
     @requires_login
     def GET(self):
+        web.header('Content-Type', 'text/html')
         grouplist = web.config.db.query(
             """SELECT
                 groups.id AS id,
@@ -34,17 +29,18 @@ class allGroups:
                 LEFT JOIN repositories ON groups.id = repositories.owner
               GROUP BY groups.id""").list()
         
-        return render.allGroups(grouplist)
+        return render.allGroups(groups=grouplist)
 
 class allRepositories:
     @requires_login
     def GET(self):
+        web.header('Content-Type', 'text/html')
         repolist = web.config.db.query(
             """SELECT id, name, owner, description
                FROM repositories
                WHERE access = 'public'""").list()
         
-        return render.allRepositories(repolist)
+        return render.allRepositories(repos=repolist)
 
 
 

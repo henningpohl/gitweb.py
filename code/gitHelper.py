@@ -1,4 +1,5 @@
 import os
+import datetime
 
 def gen_repository_list(rootdir):
     repositories = []
@@ -17,5 +18,16 @@ def get_last_updating_commit(repo, branch, filelist):
         for entry in c.tree.traverse():
             if entry.hexsha in outInfo:
                 outInfo[entry.hexsha] = c
-    return outInfo  
+    return outInfo
+
+def get_last_commit_time(repo):
+    time_list = []
+    for h in repo.heads:
+        c = repo.commit(h)
+        time_list.append(datetime.datetime.fromtimestamp(c.authored_date))
+    if len(time_list) == 0:
+        return None
+    else:
+        return max(time_list)
+    
 

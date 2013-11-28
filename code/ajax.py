@@ -5,6 +5,7 @@ from decorators import requires_login
 
 class checkId:
     def GET(self):
+        web.header('Content-Type', 'text/plain')
         if 'id' not in web.input():
             return "false"
         
@@ -16,6 +17,7 @@ class checkId:
 
 class checkRepo:
     def GET(self):
+        web.header('Content-Type', 'text/plain')
         if 'id' not in web.input():
             return "false"
 
@@ -32,6 +34,7 @@ class checkRepo:
 class getInfo:
     @requires_login
     def GET(self):
+        web.header('Content-Type', 'text/plain')
         if 'type' not in web.input():
             return ""
 

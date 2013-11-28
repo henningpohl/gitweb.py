@@ -1,0 +1,40 @@
+<%!
+	import os
+	import datetime
+%>
+
+<%def name="plural_format(value, unit)">
+	% if value > 1:
+		${value} ${unit}s
+	% else:
+		${value} ${unit}
+	% endif
+</%def>
+
+<%def name="how_long_ago(dt)">
+	% if dt == None:
+		<% return '&mdash; never' %>
+	% endif
+	<%
+    d = datetime.datetime.now() - dt
+	%>
+	% if d.days == 0:
+		% if d.seconds < 60:
+			${plural_format(d.seconds, "second")} ago
+		% elif d.seconds < 60 * 60:
+			${plural_format(int(d.seconds / 60.0), "minute")} ago
+		% else:
+			${plural_format(int(d.seconds / (60.0 * 60.0)), "hour")} ago
+		%endif
+	% elif d.days < 31:
+		${plural_format(d.days, "day")} ago
+	% elif d.days < 365:
+		${plural_format(int(d.days / 30.5), "month")} ago
+	% else:
+		${plural_format(int(d.days / 365.0), "year")} ago
+	% endif
+</%def>
+
+<%def name="parent_path(p)">
+	${os.path.split(p)[0]}
+</%def>
