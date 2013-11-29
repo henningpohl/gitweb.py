@@ -50,7 +50,7 @@ class owner:
 
         userinfo = userinfo[0]
         auth = [m for m in web.config.auth.methods if m.get_usertype() == userinfo.type][0]
-        userinfo.joined = auth.get_join_date(owner, web.config)
+        userinfo.joined = auth.get_join_date(userinfo.identifier, web.config)
 
         repos = queries.repos_for_user(owner).list()
         for r in repos:
