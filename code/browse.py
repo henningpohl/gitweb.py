@@ -1,6 +1,7 @@
 import os
 import time
 import hashlib
+import itertools
 from pygments import highlight
 from pygments.lexers import get_lexer_for_filename, get_lexer_by_name
 from pygments.formatters import HtmlFormatter
@@ -60,20 +61,28 @@ class owner:
 
         return render.userPage(user=userinfo, repos=repos, groups=groups)   
 
+def get_common_repo_info(owner, repoId):
+    d = dict(o=owner, i=repoId, u=web.config.session.userid)
+    repoInfo = web.config.db.select('repositories', d, where="id=$i and owner=$o", what="description,access,name").list()
+    if len(repoInfo) != 1:
+        return None
+
+    repoInfo = repoInfo[0]
+    curUserRights = web.config.db.select('repo_users', d, where="repoid=$i and repoowner=$o and userid=$u", what="access").list()
+    if len(curUserRights) == 1 and curUserRights[0].access == "admin":
+        repoInfo.userLevel = "admin"
+
+    return repoInfo
+
 class repositoryHome:
     @requires_login
     @requires_repo_access
     def GET(self, owner, repoId):
         web.header('Content-Type', 'text/html')
-        d = dict(o=owner,i=repoId,u=web.config.session.userid)
-        repoInfo = web.config.db.select('repositories', d, where="id=$i and owner=$o", what="description,access,name").list()
-        if len(repoInfo) != 1:
-            return web.internalerror("Invalid repository")
 
-        repoInfo = repoInfo[0]
-        curUserRights = web.config.db.select('repo_users', d, where="repoid=$i and repoowner=$o and userid=$u", what="access").list()
-        if len(curUserRights) == 1 and curUserRights[0].access == "admin":
-            repoInfo.userLevel = "admin"
+        repoInfo = get_common_repo_info(owner, repoId)
+        if repoInfo == None:
+            return web.internalerror("Invalid repository")
         
         repo = Repo(os.path.join(web.config.reporoot, owner, repoId + ".git"))
         if 'master' not in repo.heads:
@@ -86,20 +95,35 @@ class repositoryHome:
         
         return render.showRepoFiles(owner=owner, repoid=repoId, repoInfo=repoInfo, path="", filelist=filelist)
 
+class repositoryCommit:
+    @requires_login
+    @requires_repo_access
+    def GET(self, owner, repoId, commitId):
+        web.header('Content-Type', 'text/html')
+        
+        repoInfo = get_common_repo_info(owner, repoId)
+        if repoInfo == None:
+            return web.internalerror("Invalid repository")
+
+        try:
+            repo = Repo(os.path.join(web.config.reporoot, owner, repoId + ".git"))
+            commit = repo.commit(commitId)
+            changes = itertools.chain.from_iterable((commit.diff(p) for p in commit.parents))
+            
+            return render.showRepoCommit(owner=owner, repoid=repoId, repoInfo=repoInfo, commit=commit, changes=changes)
+        except BadObject, e:
+            raise web.notfound()
+        
+
 class repositoryCommits:
     @requires_login
     @requires_repo_access
     def GET(self, owner, repoId, branch):
         web.header('Content-Type', 'text/html')
-        d = dict(o=owner,i=repoId,u=web.config.session.userid)
-        repoInfo = web.config.db.select('repositories', d, where="id=$i and owner=$o", what="description,access,name").list()
-        if len(repoInfo) != 1:
-            return web.internalerror("Invalid repository")
 
-        repoInfo = repoInfo[0]
-        curUserRights = web.config.db.select('repo_users', d, where="repoid=$i and repoowner=$o and userid=$u", what="access").list()
-        if len(curUserRights) == 1 and curUserRights[0].access == "admin":
-            repoInfo.userLevel = "admin"
+        repoInfo = get_common_repo_info(owner, repoId)
+        if repoInfo == None:
+            return web.internalerror("Invalid repository")
             
         repo = Repo(os.path.join(web.config.reporoot, owner, repoId + ".git"))
         commits = repo.iter_commits('master', max_count=20)
@@ -163,12 +187,11 @@ class repositoryShowDirectory:
     @requires_repo_access
     def GET(self, owner, repoId, branch, dirpath):
         web.header('Content-Type', 'text/html')
-        d = dict(o=owner,i=repoId,u=web.config.session.userid)
-        repoInfo = web.config.db.select('repositories', d, where="id=$i and owner=$o", what="description,access,name").list()
-        if len(repoInfo) != 1:
+
+        repoInfo = get_common_repo_info(owner, repoId)
+        if repoInfo == None:
             return web.internalerror("Invalid repository")
 
-        repoInfo = repoInfo[0]
         repo = Repo(os.path.join(web.config.reporoot, owner, repoId + ".git"))
         curnode = repo.heads.master.commit.tree
         try:

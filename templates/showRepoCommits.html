@@ -14,6 +14,7 @@
 			<th>Age</th>
 			<th>Author</th>
 			<th>Message</th>
+			<th>Details</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -22,6 +23,7 @@
 			<td>${common.how_long_ago(datetime.datetime.fromtimestamp(c.authored_date))}</td>
 			<td>${c.author}</td>
 			<td>${c.message}</td>
+			<td><a href="/${owner}/${repoid}/commit/${c.hexsha}">${c.hexsha}</a></td>
 		</tr>
 	% endfor
 	</tbody>

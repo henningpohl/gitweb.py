@@ -57,3 +57,7 @@ table {
 	border: 2px solid #eee;
 	border-top-width:0px;
 }
+
+.code {
+	font-family: 'Droid Sans Mono', sans-serif;
+}

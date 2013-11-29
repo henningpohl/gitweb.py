@@ -1,0 +1,94 @@
+<%!
+	import datetime
+	import itertools
+	import difflib
+	import web
+%>
+<%page args="owner, repoid, repoInfo, commit, changes"/>
+<%inherit file="showRepoBase.html"/>
+<%namespace name="common" file="common.html"/>
+
+<%def name="diff(a_blob, b_blob)">
+	<%
+	a = a_blob.data_stream.read().splitlines()
+	b = b_blob.data_stream.read().splitlines()
+	diff = difflib.unified_diff(a, b, fromfile=a_blob.name, tofile=b_blob.name, n=1)
+	groups = itertools.groupby(diff, lambda x: x[0] == '@')
+	groups = itertools.dropwhile(lambda x: x[0] == False, groups) # skip to first diff entry
+	%>
+	% for k, g in groups:
+		% if k:
+			% if not loop.first:
+				</tbody></table>
+			% endif
+			<table class="table table-condensed table-bordered code"><tbody>
+		% endif
+	
+		% for line in g:
+			% if len(line) > 1:
+				% if line[0] == '+':
+					<tr class="success">
+				% elif line[0] == '-':
+					<tr class="error">
+				% elif line[0] == '?':
+					<tr class="warning">
+				% elif line[0] == '@':
+					<tr class="info">
+				% else:
+					<tr>
+				% endif
+					<td>${line}</td>
+				</tr>
+			% endif
+		% endfor
+		
+		% if not k:
+			</tbody></table>
+		% endif
+	% endfor
+</%def>
+
+<div class="well">
+	<div class="row-fluid">
+		<div class="pull-left">
+			<strong>${commit.author}</strong> authored ${common.how_long_ago(datetime.datetime.fromtimestamp(commit.authored_date))} <br/>
+			<strong>${commit.committer}</strong> committed ${common.how_long_ago(datetime.datetime.fromtimestamp(commit.committed_date))}
+		</div>
+		<div class="pull-right">
+			commit ${commit.hexsha} <br/>
+			parents: \
+			% if len(commit.parents) == 0:
+				none
+			% else:
+				% for p in commit.parents:
+					<a href="/${owner}/${repoid}/commit/${p.hexsha}">${p.hexsha[:6]}...</a> \
+					% if not loop.last: 
+						+ \
+					% endif
+				% endfor
+			% endif
+		</div>
+	</div>
+	<div class="row-fluid">
+		<hr/>
+		${commit.message}
+	</div>
+</div>
+
+<div>
+	% for change in changes:
+		<div style="margin-top:30px;">
+			% if change.deleted_file:
+				<span class="label label-important">Deleted</span> ${change.a_blob.path}
+			% elif change.renamed:
+				<span class="label label-info">Renamed</span> ${change.rename_from} to ${change.rename_to}				
+			% elif change.new_file:
+				<span class="label label-success">Created</span> ${change.b_blob.path}
+			% else:
+				<span class="label label-info">Changed</span> ${change.a_blob.path}
+				<br/><br/>
+				${diff(change.a_blob, change.b_blob)}
+			% endif
+		</div>
+	% endfor
+</div>

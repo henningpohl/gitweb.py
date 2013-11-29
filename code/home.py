@@ -35,6 +35,7 @@ class home:
                     repoid = r.id,
                     date = c.authored_date,
                     author = c.author,
+                    hexsha = c.hexsha,
                     message = c.message))
         commits = sorted(commits, key=lambda c: c.date, reverse=True)
         

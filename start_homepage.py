@@ -23,27 +23,29 @@ import async
 
 import time
 import web
+from common import *
 
 urls = (
-  '/favicon.ico',                             'favicon',
-  '/',                                        'home.home',
-  '/register',                                'register.register',
-  '/login',                                   'login.login',
-  '/logout',                                  'login.logout',
-  '/checkId',                                 'ajax.checkId',
-  '/checkRepo',                               'ajax.checkRepo',
-  '/getInfo',                                 'ajax.getInfo',
-  '/newRepository',                           'repositories.create',
-  '/newGroup',                                'groups.create',
-  '/adminPanel',                              'admin.adminPanel',
-  '/allGroups',                               'overview.allGroups',
-  '/allRepositories',                         'overview.allRepositories',
-  '/([\w\-]+)',                               'browse.owner',
-  '/([\w\-]+)/([\w\-]+)/commits/([\w\-]+)',   'browse.repositoryCommits',
-  '/([\w\-]+)/([\w\-]+)/blob/([\w\-]+)/(.+)', 'browse.repositoryShowFile',
-  '/([\w\-]+)/([\w\-]+)/tree/([\w\-]+)/(.*)', 'browse.repositoryShowDirectory',
-  '/([\w\-]+)/([\w\-]+)/settings',            'repositories.settings',
-  '/([\w\-]+)/([\w\-]+)',                     'browse.repositoryHome',  
+  '/favicon.ico',                                'favicon',
+  '/',                                           'home.home',
+  '/register',                                   'register.register',
+  '/login',                                     'login.login',
+  '/logout',                                    'login.logout',
+  '/checkId',                                   'ajax.checkId',
+  '/checkRepo',                                 'ajax.checkRepo',
+  '/getInfo',                                    'ajax.getInfo',
+  '/newRepository',                             'repositories.create',
+  '/newGroup',                                  'groups.create',
+  '/adminPanel',                                'admin.adminPanel',
+  '/allGroups',                                 'overview.allGroups',
+  '/allRepositories',                           'overview.allRepositories',
+  '/([\w\-]+)',                                 'browse.owner',
+  '/([\w\-]+)/([\w\-]+)/commit/([a-zA-Z0-9]+)', 'browse.repositoryCommit',
+  '/([\w\-]+)/([\w\-]+)/commits/([\w\-]+)',     'browse.repositoryCommits',
+  '/([\w\-]+)/([\w\-]+)/blob/([\w\-]+)/(.+)',   'browse.repositoryShowFile',
+  '/([\w\-]+)/([\w\-]+)/tree/([\w\-]+)/(.*)',   'browse.repositoryShowDirectory',
+  '/([\w\-]+)/([\w\-]+)/settings',              'repositories.settings',
+  '/([\w\-]+)/([\w\-]+)',                       'browse.repositoryHome',  
 )
 
 app = web.application(urls, globals(), autoreload=False)
@@ -58,11 +60,6 @@ if web.config.get('_session') is None:
 class favicon:
     def GET(self):
         raise web.redirect("/static/favicon.ico")
-
-render = web.template.render(
-    'templates/',
-    base='main',
-    globals={'time':time, 'session':web.config.session, 'ctx':web.ctx})
 
 def notfound():
     try:
