@@ -5,6 +5,7 @@ setup(
     install_requires=[
         'web.py>=0.37',
         'pygments',
+        'mako',
         'python-ldap',
         'GitPython'
     ]    
