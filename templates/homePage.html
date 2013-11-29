@@ -17,7 +17,7 @@
 					<div style="margin-bottom:40px;">
 						<div>
 							<div class="pull-left"><i class="fa fa-cloud-upload fa-4x"></i></div>
-							<h4><a href="/${n.author}"><i class="fa fa-user"></i> ${n.author}</a> committed to <a href="/${n.ownerid}/${n.repoid}"><i class="fa fa-book"></i> ${n.repoid}</a></h4>
+							<h4><i class="fa fa-user"></i> ${n.author} committed to <a href="/${n.ownerid}/${n.repoid}"><i class="fa fa-book"></i> ${n.repoid}</a></h4>
 							<p class="muted" style="margin-left:70px;">${common.how_long_ago(datetime.datetime.fromtimestamp(n.date))} [<a href="/${n.ownerid}/${n.repoid}/commit/${n.hexsha}">${n.hexsha[:6]}...</a>]</p>
 						</div>
 						<div class="well well-small">
