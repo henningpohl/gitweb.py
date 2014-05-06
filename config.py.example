@@ -13,7 +13,7 @@ web.config.auth.ldapserver = "ldap://IP:PORT"
 web.config.auth.ldapbasedn = "ou=users,dc=HOST"
 web.config.auth.ldapbasedn = "ou=users,dc=HOST"
 web.config.auth.ldapadmingroup = "cn=admin,ou=groups,dc=HOST"
-web.config.auth.ldapusergroup = "cn=git,ou=groups,dc=HOST"
+web.config.auth.ldapusergroup = "cn=git,ou=groups,dc=HOST" # or 'None' if no group check is desired
 
 # Password salt - change for your instance
 web.config.salt = "_________"

@@ -72,6 +72,11 @@ class LdapAuth(Auth):
             user = "uid=%s,%s" % (username, config.auth.ldapbasedn)
             l.simple_bind_s(user, password)
 
+            if config.auth.ldapusergroup is not None:
+                group_membership = l.search_s(config.auth.ldapusergroup, ldap.SCOPE_BASE, "memberUid=%s" % username)
+                if len(group_membership) is not 1:
+                    return False, {}
+
             u = config.db.select('ldapusers', dict(u=username), where="username=$u", what="id, name").list()
             if len(u) is not 1: # there is no such user yet, redirect to registration
                 cn = l.search_s(config.auth.ldapbasedn, ldap.SCOPE_SUBTREE, "uid=%s" % username, ["cn"])[0][1]['cn'][0]
