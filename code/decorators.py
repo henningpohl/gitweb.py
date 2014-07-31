@@ -32,7 +32,15 @@ def requires_repo_admin(func):
 
 def requires_repo_access(func):
     def wrapped(*args, **kwargs):
-        # TODO: Write 
-        return func(*args, **kwargs)
+        if len(args) != 3:
+            raise web.seeother('/')
+
+        d = dict(o=args[1],i=args[2],u=web.config.session.userid)
+        curUserRights = web.config.db.select('repo_users', d, where="repoid=$i and repoowner=$o and userid=$u", what="access").list()
+        
+        if len(curUserRights) != 1:
+            raise web.seeother('/')
+        else:
+            return func(*args, **kwargs)
     return wrapped
         
