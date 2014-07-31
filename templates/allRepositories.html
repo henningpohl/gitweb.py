@@ -4,28 +4,18 @@
 <%page args="repos"/>
 <%inherit file="main.html"/>
 
-<div>
 <h2>All public repositories</h2>
-<table class="table table-bordered table-condensed">
-<thead>
-	<tr>
-		<th>Repository name</th>
-		<th>Owner</th>
-		<th></th>
-	</tr>
-</thead>
-<tbody>
-% for f in repos:
-	<tr>
-		<td>${f.name}</td>
-		<td>${f.owner}</td>
-		<td><a href="/${f.owner}/${f.id}">go to repository</a></td>
-	</tr>
-	% if f.description != '':
-		<tr><td colspan="5">${f.description}</td></tr>
+<div class="container-fluid">
+	% for r in repos:
+	<div class="row-fluid">
+		<div class="span1 offset1"><i class="fa fa-book fa-4x"></i></div>
+		<div class="span10">
+			<h2 style="margin:0px;"><a href="/${r.owner}/${r.id}">${r.owner} / ${r.name}</a></h2>
+			<p>${r.description}&nbsp;</p>
+		</div>
+	</div>
+	% endfor
+	% if repos == []:
+		<div class="row-fluid"><p>No public repositories</p></div>
 	% endif
-% endfor
-</tbody>
-</table>
-
 </div>

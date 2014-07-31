@@ -3,32 +3,20 @@
 %>
 <%page args="groups"/>
 <%inherit file="main.html"/>
+<%namespace name="common" file="common.html"/>
 
-<div>
 <h2>All public groups</h2>
-<table class="table table-bordered table-condensed">
-<thead>
-	<tr>
-		<th>Group name</th>
-		<th>Owner</th>
-		<th># members</th>
-		<th># repositories</th>
-		<th></th>
-	</tr>
-</thead>
-<tbody>
-% for g in groups:
-	<tr>
-		<td>${g.name}</td>
-		<td>${g.owner}</td>
-		<td>${g.num_users}</td>
-		<td>${g.num_repos}</td>
-		<td><a href="/${g.id}">go to group</a></td>
-	</tr>
-	% if g.description != '':
-		<tr><td colspan="5">${g.description}</td></tr>
+<div class="container-fluid">
+	% for g in groups:
+	<div class="row-fluid">
+		<div class="span1 offset1"><i class="fa fa-group fa-4x"></i></div>
+		<div class="span10">
+			<h2 style="margin:0px;"><a href="/${g.id}">${g.name}</a></h2>
+			<p>${common.plural_format(g.num_users, "member")}, ${common.plural_format(g.num_repos, "repository")}<p>
+		</div>
+	</div>
+	% endfor
+	% if groups == []:
+		<div class="row-fluid"><p>No public groups</p></div>
 	% endif
-% endfor
-</tbody>
-</table>
 </div>

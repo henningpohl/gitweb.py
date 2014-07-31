@@ -4,10 +4,18 @@
 %>
 
 <%def name="plural_format(value, unit)">
-	% if value > 1:
-		${value} ${unit}s
+	% if unit.endswith('y'):
+		% if value == 1:
+			${value} ${unit}
+		% else:
+			${value} ${unit[:-1]}ies
+		% endif
 	% else:
-		${value} ${unit}
+		% if value > 1:
+			${value} ${unit}s
+		% else:
+			${value} ${unit}
+		% endif
 	% endif
 </%def>
 
