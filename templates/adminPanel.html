@@ -1,125 +1,133 @@
-$def with(userlist, grouplist, repositorylist, lostRepos)
+<%!
+	import datetime
+	import web
+%>
+<%page args="userlist, grouplist, repositorylist, lostRepos"/>
+<%inherit file="main.html"/>
+<%namespace name="common" file="common.html"/>
 
+<%block name="head">
 <script type="text/javascript">
-	$$(document).ready(function(){
-		$$(".repoDelete").click(function() {
-			row = $$(this).parentsUntil("tr").parent();
+	$(document).ready(function(){
+		$(".repoDelete").click(function() {
+			row = $(this).parentsUntil("tr").parent();
 			command = {
 				"action" : "deleteRepo",
-				"ownerId" : $$(this).data('ownerid'),
-				"repoId" : $$(this).data('repoid')
+				"ownerId" : $(this).data('ownerid'),
+				"repoId" : $(this).data('repoid')
 			};
-			$$.post("/adminPanel", command, function(data) {
+			$.post("/adminPanel", command, function(data) {
 				if(data != "error") {
 					row.fadeOut(200);
 				}
 			});
 		});
 		
-		$$(".groupDelete").click(function() {
-			row = $$(this).parentsUntil("tr").parent();
+		$(".groupDelete").click(function() {
+			row = $(this).parentsUntil("tr").parent();
 			command = {
 				"action" : "deleteGroup",
-				"groupId" : $$(this).data('groupid')
+				"groupId" : $(this).data('groupid')
 			};
-			$$.post("/adminPanel", command, function(data) {
+			$.post("/adminPanel", command, function(data) {
 				if(data != "error") {
 					row.fadeOut(200);
 				}
 			});
 		});
 		
-		$$(".userDelete").click(function() {
-			row = $$(this).parentsUntil("tr").parent();
+		$(".userDelete").click(function() {
+			row = $(this).parentsUntil("tr").parent();
 			command = {
 				"action" : "deleteUser",
-				"userId" : $$(this).data('userid'),
-				"userType" : $$(this).data('usertype')
+				"userId" : $(this).data('userid'),
+				"userType" : $(this).data('usertype')
 			};
-			$$.post("/adminPanel", command, function(data) {
+			$.post("/adminPanel", command, function(data) {
 				if(data != "error") {
 					row.fadeOut(200);
 				}
 			});
 		});
 		
-		$$(".userApprove").click(function() {
-			btn = $$(this);
+		$(".userApprove").click(function() {
+			btn = $(this);
 			command = {
 				"action" : "approveUser",
-				"userId" : $$(this).data('userid')
+				"userId" : $(this).data('userid')
 			};
-			$$.post("/adminPanel", command, function(data) {
+			$.post("/adminPanel", command, function(data) {
 				if(data != "error") {
 					btn.fadeOut(200);
 				}
 			});
 		});
 		
-		$$(".userPromote").click(function() {
-			btn = $$(this);
+		$(".userPromote").click(function() {
+			btn = $(this);
 			command = {
 				"action" : "promoteUser",
-				"userId" : $$(this).data('userid')
+				"userId" : $(this).data('userid')
 			};
-			$$.post("/adminPanel", command, function(data) {
+			$.post("/adminPanel", command, function(data) {
 				if(data != "error") {
 					btn.fadeOut(200);
 				}
 			});
 		});
 		
-		$$(".userDemote").click(function() {
-			btn = $$(this);
+		$(".userDemote").click(function() {
+			btn = $(this);
 			command = {
 				"action" : "demoteUser",
-				"userId" : $$(this).data('userid')
+				"userId" : $(this).data('userid')
 			};
-			$$.post("/adminPanel", command, function(data) {
+			$.post("/adminPanel", command, function(data) {
 				if(data != "error") {
 					btn.fadeOut(200);
 				}
 			});
 		});
 		
-		$$(".lostRepoDelete").click(function() {
-			btn = $$(this);
+		$(".lostRepoDelete").click(function() {
+			btn = $(this);
 			command = {
 				"action" : "deleteLostRepo",
-				"repopath" : $$(this).data('repopath')
+				"repopath" : $(this).data('repopath')
 			};
-			$$.post("/adminPanel", command, function(data) {
+			$.post("/adminPanel", command, function(data) {
 				if(data != "error") {
 					row.fadeOut(200);
 				}
 			});
 		});
 		
-		$$('#lostRepoUserChoice').on('hidden', function () {
-			$$('#lostRepoUserChoice .btn-primary').unbind();
+		$('#lostRepoUserChoice').on('hidden', function () {
+			$('#lostRepoUserChoice .btn-primary').unbind();
 		})
-		$$(".lostRepoAssign").click(function() {
-			row = $$(this).parentsUntil("tr").parent();
-			repopath = $$(this).data('repopath');
+		$(".lostRepoAssign").click(function() {
+			row = $(this).parentsUntil("tr").parent();
+			repopath = $(this).data('repopath');
 			console.log(repopath);
-			$$('#lostRepoUserChoice .btn-primary').click(function() {
+			$('#lostRepoUserChoice .btn-primary').click(function() {
 				command = {
 					"action" : "assignLostRepo",
 					"repopath" : repopath,
-					"userid" : $$('#lostRepoUserChoice :checked').val()
+					"userid" : $('#lostRepoUserChoice :checked').val()
 				};
 				console.log(command);
-				$$('#lostRepoUserChoice').modal('hide');
-				$$.post("/adminPanel", command, function(data) {
+				$('#lostRepoUserChoice').modal('hide');
+				$.post("/adminPanel", command, function(data) {
 					if(data != "error") {
 						row.fadeOut(200);
 					}
 				});
 			});
-			$$('#lostRepoUserChoice').modal('show');
+			$('#lostRepoUserChoice').modal('show');
 		});
 	});
 </script>
+</%block>
 
 <div class="alert">
 	<button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -140,26 +148,35 @@ $def with(userlist, grouplist, repositorylist, lostRepos)
 	</tr>
 </thead>
 <tbody>
-$for u in userlist:
+% for u in userlist:
 	<tr>
-		<td>$u.id</td>
-		<td>$u.type</td>
-		<td>$u.identifier</td>
-		<td>$u.name</td>
-		<td>$u.userrights</td>
+		<td>${u.id}</td>
+		<td>${u.type}</td>
+		<td>${u.identifier}</td>
+		<td>${u.name}</td>
+		<td>${u.userrights}</td>
 		<td>
+		% if u.type == 'ldapuser':
+			User is managed by LDAP
+		% elif u.type == 'localuser':
 			<div class="btn-group">
-			$if u.userrights == "member":
-				<button class="btn userPromote" data-userid="$u.id" title="Make user admin"><i class="icon-chevron-up"></i></button>
-			$if u.userrights == "admin":
-				<button class="btn userDemote" data-userid="$u.id" title="Remove admin status"><i class="icon-chevron-down"></i></button>
-			$if u.userrights == "none":
-				<button class="btn userApprove" data-userid="$u.id" title="Approve user"><i class="icon-ok-sign"></i></button>
-			$if True:
-				<button class="btn userDelete" data-userid="$u.id" data-usertype="$u.type" title="Delete user"><i class="icon-trash"></i></button>
+			% if u.userrights == "member":
+				<button class="btn userPromote" data-userid="${u.id}" title="Make user admin"><i class="icon-chevron-up"></i></button>
+			% endif
+			% if u.userrights == "admin":
+				<button class="btn userDemote" data-userid="${u.id}" title="Remove admin status"><i class="icon-chevron-down"></i></button>
+			% endif
+			% if u.userrights == "none":
+				<button class="btn userApprove" data-userid="${u.id}" title="Approve user"><i class="icon-ok-sign"></i></button>
+			% endif
+			<button class="btn userDelete" data-userid="${u.id}" data-usertype="${u.type}" title="Delete user"><i class="icon-trash"></i></button>
 			</div>
+		% else:
+			You shouldn't see this
+		% endif
 		</td>
 	</tr>
+% endfor
 </tbody>
 </table>
 </div>
@@ -175,17 +192,18 @@ $for u in userlist:
 	</tr>
 </thead>
 <tbody>
-$for p in grouplist:
+% for p in grouplist:
 	<tr>
-		<td>$p.id</td>
-		<td>$p.name</td>
+		<td>${p.id}</td>
+		<td>${p.name}</td>
 		<td>
 			<div class="btn-group">
 				<button class="btn" title="Change owner"><i class="icon-user"></i></button>
-				<button class="btn groupDelete" data-groupid="$u.id" title="Delete group"><i class="icon-trash"></i></button>
+				<button class="btn groupDelete" data-groupid="${u.id}" title="Delete group"><i class="icon-trash"></i></button>
 			</div>
 		</td>
 	</tr>
+% endfor
 </tbody>
 </table>
 </div>
@@ -202,22 +220,23 @@ $for p in grouplist:
 	</tr>
 </thead>
 <tbody>
-$for u in repositorylist:
+% for u in repositorylist:
 	<tr>
-		<td>$u.id</td>
-		<td>$u.name</td>
-		<td>$u.owner</td>
+		<td>${u.id}</td>
+		<td>${u.name}</td>
+		<td>${u.owner}</td>
 		<td>
 			<div class="btn-group">
-				<button class="btn repoDelete" data-repoid="$u.id" data-ownerid="$u.owner" title="Delete repository"><i class="icon-trash"></i></button>
+				<button class="btn repoDelete" data-repoid="${u.id}" data-ownerid="${u.owner}" title="Delete repository"><i class="icon-trash"></i></button>
 			</div>
 		</td>
 	</tr>
+% endfor
 </tbody>
 </table>
 </div>
 
-$if len(lostRepos) > 0:
+% if len(lostRepos) > 0:
 	<div>
 	<h2>Lost Repositories</h2>
 	<table class="table table-hover table-striped">
@@ -228,16 +247,17 @@ $if len(lostRepos) > 0:
 		</tr>
 	</thead>
 	<tbody>
-	$for r in lostRepos:
+	% for r in lostRepos:
 		<tr>
-			<td>$:r</td>
+			<td>${r}</td>
 			<td>
 				<div class="btn-group">
-					<button class="btn lostRepoAssign" data-repopath="$:(r)" title="Transfer repository"><i class="icon-gift"></i></button>
-					<button class="btn lostRepoDelete" data-repopath="$:(r)" title="Purge repository"><i class="icon-trash"></i></button>
+					<button class="btn lostRepoAssign" data-repopath="${r}" title="Transfer repository"><i class="icon-gift"></i></button>
+					<button class="btn lostRepoDelete" data-repopath="${r}" title="Purge repository"><i class="icon-trash"></i></button>
 				</div>
 			</td>
 		</tr>
+	% endfor
 	</tbody>
 	</table>
 	</div>
@@ -248,19 +268,21 @@ $if len(lostRepos) > 0:
 			<h3 id="myModalLabel">Pick user</h3>
 		</div>
 		<div class="modal-body">
-			$for u in userlist:
+			% for u in userlist:
 				<label class="radio">
-					$if loop.first:
-						<input type="radio" name="lostRepoUserChoiceRadio" value="$u.id" checked>
-					$else:
-						<input type="radio" name="lostRepoUserChoiceRadio" value="$u.id">
-					$u.id ($u.name)
+					% if loop.first:
+						<input type="radio" name="lostRepoUserChoiceRadio" value="${u.id}" checked>
+					% else:
+						<input type="radio" name="lostRepoUserChoiceRadio" value="${u.id}">
+					% endif
+					${u.id} (${u.name})
 				</label>
+			% endfor
 		</div>
 		<div class="modal-footer">
 		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
 		<button class="btn btn-primary">Transfer repository</button>
 		</div>
 	</div>
-
+% endif
 

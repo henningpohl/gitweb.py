@@ -5,13 +5,9 @@ import shutil
 import web
 from web import form
 from decorators import requires_login, requires_admin
+from common import *
 from util import make_id_string, check_id
 from gitHelper import gen_repository_list
-
-render = web.template.render(
-    'templates/',
-    base='main',
-    globals={'time':time, 'session':web.config.session})
 
 class adminPanel:
     @requires_admin
@@ -33,7 +29,8 @@ class adminPanel:
         notindatabaserepos = filesystemrepos.difference(databaserepos)
         #notindatabaserepos = [os.path.split(nr) for nr in notindatabaserepos]
        
-        return render.adminPanel(userlist, grouplist, repositorylist, notindatabaserepos)
+        return render.adminPanel(userlist=userlist, grouplist=grouplist, repositorylist=repositorylist, lostRepos=notindatabaserepos)
+        
 
     @requires_admin
     @requires_login  
