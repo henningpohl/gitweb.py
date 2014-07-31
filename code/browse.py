@@ -52,7 +52,7 @@ class owner:
         auth = [m for m in web.config.auth.methods if m.get_usertype() == userinfo.type][0]
         userinfo.joined = auth.get_join_date(userinfo.identifier, web.config)
 
-        repos = queries.repos_for_user(owner).list()
+        repos = queries.viewable_repos_for_user(owner, web.config.session.userid).list()
         for r in repos:
             repo = Repo(os.path.join(web.config.reporoot, r.owner, r.id + ".git"))
             r.lastUpdate = gitHelper.get_last_commit_time(repo)

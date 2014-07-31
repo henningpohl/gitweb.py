@@ -17,6 +17,18 @@ def repos_for_user(user):
              SELECT groupid FROM group_users WHERE group_users.userid = $u
            )""", vars=dict(u=user))
 
+def viewable_repos_for_user(user, viewer):
+    return web.config.db.query(
+        """  SELECT id, owner, name
+             FROM repositories
+             WHERE owner = $u AND access = 'public'
+           UNION
+             SELECT repositories.id, repositories.owner, repositories.name
+             FROM repo_users INNER JOIN repositories
+             ON repo_users.repoid = repositories.id
+             WHERE repo_users.userid = $v AND repositories.owner = $u
+        """,  vars=dict(u=user, v=viewer))
+
 def members_for_group(group):
     return web.config.db.query(
         """SELECT users.id AS id, group_users.role AS role, users.name AS name
