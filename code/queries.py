@@ -11,7 +11,7 @@ def repos_for_user(user):
     return web.config.db.query(
         """SELECT repositories.id, repositories.owner, repositories.name
            FROM repo_users INNER JOIN repositories
-           ON repo_users.repoid = repositories.id
+           ON repo_users.repoid = repositories.id AND repo_users.repoowner = repositories.owner
            WHERE repo_users.userid = $u
            OR repo_users.userid IN (
              SELECT groupid FROM group_users WHERE group_users.userid = $u
@@ -19,14 +19,10 @@ def repos_for_user(user):
 
 def viewable_repos_for_user(user, viewer):
     return web.config.db.query(
-        """  SELECT id, owner, name
-             FROM repositories
-             WHERE owner = $u AND access = 'public'
-           UNION
-             SELECT repositories.id, repositories.owner, repositories.name
-             FROM repo_users INNER JOIN repositories
-             ON repo_users.repoid = repositories.id
-             WHERE repo_users.userid = $v AND repositories.owner = $u
+        """SELECT repoid, owner, name
+           FROM repo_access INNER JOIN repositories
+           ON repo_access.repoid = repositories.id AND repo_access.repoowner = repositories.owner
+           WHERE repo_access.userid = $v AND repo_access.repoowner = $u
         """,  vars=dict(u=user, v=viewer))
 
 def members_for_group(group):
