@@ -90,7 +90,7 @@
 		});
 		
 		$(".lostRepoDelete").click(function() {
-			btn = $(this);
+			row = $(this).parentsUntil("tr").parent();
 			command = {
 				"action" : "deleteLostRepo",
 				"repopath" : $(this).data('repopath')
@@ -156,8 +156,9 @@
 		<td>${u.name}</td>
 		<td>${u.userrights}</td>
 		<td>
+			<div class="btn-group">
 		% if u.type == 'ldapuser':
-			User is managed by LDAP
+			<button class="btn userDelete" data-userid="${u.id}" data-usertype="${u.type}" title="Delete user"><i class="icon-trash"></i></button>
 		% elif u.type == 'localuser':
 			<div class="btn-group">
 			% if u.userrights == "member":
@@ -170,9 +171,9 @@
 				<button class="btn userApprove" data-userid="${u.id}" title="Approve user"><i class="icon-ok-sign"></i></button>
 			% endif
 			<button class="btn userDelete" data-userid="${u.id}" data-usertype="${u.type}" title="Delete user"><i class="icon-trash"></i></button>
-			</div>
 		% else:
 			You shouldn't see this
+			</div>
 		% endif
 		</td>
 	</tr>
