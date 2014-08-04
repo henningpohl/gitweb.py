@@ -13,7 +13,7 @@ import config
 from auth import RequireRegistrationException
 
 def get_rights(userid, ownerid, repoid):
-    access = web.config.db.select("repo_users", what='access', where=web.db.sqlwhere({
+    access = web.config.db.select("repo_access", what='access', where=web.db.sqlwhere({
         'repoid':repoid, 'repoowner':ownerid, 'userid': userid
         }))
     if bool(access) == False:
