@@ -17,6 +17,7 @@ import gitHelper
 class owner:
     @requires_login
     def GET(self, owner):
+        web.header('Content-Type', 'text/html')
         userinfo = web.config.db.select("owners", dict(u=owner), where="id=$u").list()
         if len(userinfo) != 1:
             raise web.notfound()
