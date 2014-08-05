@@ -1,3 +1,4 @@
+﻿## -*- coding: utf-8 -*-
 <%!
 	import datetime
 	import itertools
@@ -37,7 +38,7 @@
 				% else:
 					<tr>
 				% endif
-					<td>${line}</td>
+					<td>${line.decode('utf-8')}</td>
 				</tr>
 			% endif
 		% endfor

@@ -237,8 +237,8 @@ class repositoryShowFile:
             %s
             """ % style
 
-        rawcontent = curnode.data_stream.read()
-        content = highlight(rawcontent, lexer, formatter)       
+        rawcontent = curnode.data_stream.read().decode('utf-8')
+        content = highlight(rawcontent, lexer, formatter) 
 
         fileinfo = {
             'path': filepath,
