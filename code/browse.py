@@ -173,7 +173,7 @@ class repositoryCommit:
         try:
             repo = Repo(os.path.join(web.config.reporoot, owner, repoId + ".git"))
             commit = repo.commit(commitId)
-            changes = itertools.chain.from_iterable((commit.diff(p) for p in commit.parents))
+            changes = itertools.chain.from_iterable((p.diff(commit) for p in commit.parents))
             
             return render.showRepoCommit(owner=owner, repoid=repoId, repoInfo=repoInfo, commit=commit, changes=changes)
         except BadObject, e:
