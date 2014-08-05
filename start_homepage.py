@@ -26,14 +26,14 @@ import web
 from common import *
 
 urls = (
-  '/favicon.ico',                                'favicon',
-  '/',                                           'home.home',
-  '/register',                                   'register.register',
+  '/favicon.ico',                               'favicon',
+  '/',                                          'home.home',
+  '/register',                                  'register.register',
   '/login',                                     'login.login',
   '/logout',                                    'login.logout',
   '/checkId',                                   'ajax.checkId',
   '/checkRepo',                                 'ajax.checkRepo',
-  '/getInfo',                                    'ajax.getInfo',
+  '/getInfo',                                   'ajax.getInfo',
   '/newRepository',                             'repositories.create',
   '/newGroup',                                  'groups.create',
   '/adminPanel',                                'admin.adminPanel',

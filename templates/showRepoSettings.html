@@ -43,10 +43,10 @@
 		});
 		
 		function checkConfirmString(elem) {
-			if(elem.val() == "yes, I really want to delete this repository") {
-				elem.siblings(".confirmSubmit").attr("disabled", false);
+			if(elem.val() === "yes, I really want to delete this repository") {
+				elem.siblings().find(".confirmSubmit").attr("disabled", false);
 			} else {
-				elem.siblings(".confirmSubmit").attr("disabled", true);
+				elem.siblings().find(".confirmSubmit").attr("disabled", true);
 			}
 		}
 		
@@ -61,102 +61,98 @@
 	</script>
 </%block>
 
-<div>
-	<h4>Update repository information</h4>
-	<form method="POST" class="form-horizontal">
-		<div class="control-group">
-			<label class="control-label" for="inputDesc">Description</label>
-			<div class="controls">
-				<textarea name="desc" id="inputDesc" class="input-xlarge" rows="4">${repoInfo.description}</textarea>
-			</div>
-		</div>
-		
-		<div class="control-group">
-			<label class="control-label" for="inputName">Access</label>
-			<div class="controls">
-				<label class="radio">Public:
-				% if repoInfo.access == 'public':
-					<input type="radio" name="access" value="public" checked> Anyone can see this repository. You choose who can commit.
-				% else:
-					<input type="radio" name="access" value="public"> Anyone can see this repository. You choose who can commit.
-				% endif
-				</label>
-				<label class="radio">Private:
-				% if repoInfo.access == 'private':
-					<input type="radio" name="access" value="private" checked> You choose who can see and commit to this repository.
-				% else:
-					<input type="radio" name="access" value="private"> You choose who can see and commit to this repository.
-				% endif
-				</label>
-			</div>
-		</div>
-		<input type="hidden" name="type" value="info" />
-		<button class="btn btn-large btn-primary offset5" type="submit">Update Repository</button>
-	</form>
+<h4>Update repository information</h4>
+
+<form method="POST" role="form">
+	<div class="form-group">
+		<label for="inputDesc">Description</label>
+		<textarea name="desc" id="inputDesc" class="form-control" rows="4">${repoInfo.description}</textarea>
+	</div>
 	
-	<h4>Manage collaborators</h4>
-	<table class="table table-bordered table-condensed">
-	<thead>
-		<tr>
-			<th>Userid</th>
-			<th>Access rights</th>
-			<th>Actions</th>
-		</tr>
-	</thead>
-	<tbody>
-	% for c in collaborators:
-		<tr>
-			<td><a href="/${c.userid}">${c.userid}</a></td>
-			<td>${c.access}</td>
+	<div class="form-group">
+		<label for="inputName">Access</label>
+		<div class="radio">
+			<label>
+				<input type="radio" name="access" value="public" ${"checked" if repoInfo.access == "public" else ""}><i>Public</i> &mdash; anyone can see this repository. You choose who can commit.
+			</label>
+		</div>
+		<div class="radio">
+			<label>
+				<input type="radio" name="access" value="private" ${"checked" if repoInfo.access == "private" else ""}><i>Private</i> &mdash; you choose who can see and commit to this repository.
+			</label>
+		</div>
+	</div>
+	
+	<input type="hidden" name="type" value="info" />
+	<button class="btn btn-large btn-primary pull-right" type="submit">Update Repository Information</button>
+</form>
+
+<div class="clearfix"></div>
+
+<h4>Manage collaborators</h4>
+<table class="table table-bordered table-condensed">
+<thead>
+	<tr>
+		<th>Userid</th>
+		<th>Access rights</th>
+		<th>Actions</th>
+	</tr>
+</thead>
+<tbody>
+% for c in collaborators:
+	<tr>
+		<td><a href="/${c.userid}">${c.userid}</a></td>
+		<td>${c.access}</td>
+		<td>
+			<button class="btn btn-mini userRemove" data-userid="${c.userid}" title="remove"><i class="fa fa-times"></i></button>
+		% if c.access != "read":
+			<button class="btn btn-mini userRead" data-userid="${c.userid}" title="set read rights"><i class="fa fa-eye"></i></button>
+		% else:
+			<button class="btn btn-mini" title="set read rights" disabled><i class="fa fa-eye"></i></button>
+		% endif
+		% if c.access != "write":
+			<button class="btn btn-mini userWrite" data-userid="${c.userid}" title="set write rights"><i class="fa fa-pencil"></i></button>
+		% else:
+			<button class="btn btn-mini" title="set write rights" disabled><i class="fa fa-pencil"></i></button>
+		% endif
+		% if c.access != "admin":
+			<button class="btn btn-mini userAdmin" data-userid="${c.userid}" title="set admin rights"><i class="fa fa-briefcase"></i></button>
+		% else:
+			<button class="btn btn-mini" title="set admin rights" disabled><i class="fa fa-briefcase"></i></button>
+		% endif
+		</td>
+	</tr>
+% endfor
+</tbody>
+<tfoot>
+	<tr>
+		<form method="POST" class="form-horizontal">
+			<input type="hidden" name="type" value="user" />
 			<td>
-				<button class="btn btn-mini userRemove" data-userid="${c.userid}" title="remove"><i class="icon-remove"></i></button>
-			% if c.access != "read":
-				<button class="btn btn-mini userRead" data-userid="${c.userid}" title="set read rights"><i class="icon-eye-open"></i></button>
-			% else:
-				<button class="btn btn-mini" title="set read rights" disabled><i class="icon-eye-open"></i></button>
-			% endif
-			% if c.access != "write":
-				<button class="btn btn-mini userWrite" data-userid="${c.userid}" title="set write rights"><i class="icon-pencil"></i></button>
-			% else:
-				<button class="btn btn-mini" title="set write rights" disabled><i class="icon-pencil"></i></button>
-			% endif
-			% if c.access != "admin":
-				<button class="btn btn-mini userAdmin" data-userid="${c.userid}" title="set admin rights"><i class="icon-briefcase"></i></button>
-			% else:
-				<button class="btn btn-mini" title="set admin rights" disabled><i class="icon-briefcase"></i></button>
-			% endif
+				<select name="userid">
+				% for u in users:
+					<option value="${u.id}">${u.name} (${u.id})</option>
+				% endfor
+				</select>
 			</td>
-		</tr>
-	% endfor
-	</tbody>
-	<tfoot>
-		<tr>
-			<form method="POST" class="form-horizontal">
-				<input type="hidden" name="type" value="user" />
-				<td>
-					<select name="userid">
-					% for u in users:
-						<option value="${u.id}">${u.name} (${u.id})</option>
-					% endfor
-					</select>
-				</td>
-				<td>
-					<select name="access"><option>read</option><option>write</option><option>admin</option></select>
-				</td>
-				<td><button class="btn btn-primary" type="submit">Add collaborator</button></td>
-			</form>
-		</tr>
-	</tfoot>
-	</table>
-	
-	<h4>Delete repository</h4>
-	<p>Deleting a repository removes all associated data from the server. Neither you or any of your collaborators will be able to access it afterwards. To confirm this step enter <strong>yes, I really want to delete this repository</strong> in the box below.</p>
-	
-	<form method="POST" class="form-inline offset2">
-		<input type="hidden" name="type" value="delete" />
-		<div class="input-append">
-			<input class="span16 confirmText" type="text" name="confirm" />
+			<td>
+				<select name="access"><option>read</option><option>write</option><option>admin</option></select>
+			</td>
+			<td><button class="btn btn-primary" type="submit">Add collaborator</button></td>
+		</form>
+	</tr>
+</tfoot>
+</table>
+
+<h4>Delete repository</h4>
+<p>Deleting a repository removes all associated data from the server. Neither you or any of your collaborators will be able to access it afterwards. To confirm this step enter <strong>yes, I really want to delete this repository</strong> in the box below.</p>
+
+<form method="POST" class="form-inline col-md-9">
+	<input type="hidden" name="type" value="delete" />
+	<div class="input-group col-md-12">
+		<input class="form-control confirmText" type="text" name="confirm" />
+		<span class="input-group-btn">
 			<button class="btn btn-danger confirmSubmit" type="submit" disabled>Delete Repository</button>
-		</div>
-	</form>
-</div>
+		</span>
+	</div>
+</form>

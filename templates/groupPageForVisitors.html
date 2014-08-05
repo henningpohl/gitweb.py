@@ -1,0 +1,52 @@
+<%!
+	import web
+%>
+<%page args="group, repos, members"/>
+<%inherit file="ownerBase.html"/>
+<%namespace name="common" file="common.html"/>
+
+<%block name="icon">fa-group</%block>
+<%block name="owner">${group.name}</%block>
+<%block name="tagline">
+% if group.description:
+	${group.description}
+% else:
+	No description
+% endif
+</%block>
+
+<%block name="header_extra">
+	% if group.joinable == 1:
+		<button type="button" class="btn btn-success btn-lg"><i class="fa fa-plus"></i> &nbsp; Join group</button>
+	% else:
+		<button type="button" class="btn btn-default btn-lg" disabled="disabled">Joining disabled <br/> Ask a group admin for membership</button>
+	% endif
+</%block>
+
+<h2>Repositories</h2>
+<div class="container-fluid">
+	% for r in repos:
+		<%common:icon_info_block>
+			<%def name="blockicon()">fa-book</%def>
+			<%def name="blockhead()"><a href="/${r.owner}/${r.id}">${r.owner} / ${r.name}</a></%def>
+			<%def name="blockbody()">Last updated ${common.how_long_ago(r.lastUpdate)}</%def>
+		</%common:icon_info_block>
+	% endfor
+	% if repos == []:
+		<div class="row-fluid"><p>No repositories</p></div>
+	% endif
+</div>
+
+<h2>Members</h2>
+<div class="container-fluid">
+	% for m in members:
+		<%common:icon_info_block>
+			<%def name="blockicon()">fa-user</%def>
+			<%def name="blockhead()"><a href="/${m.id}">${m.name}</a></%def>
+			<%def name="blockbody()">${m.role}</%def>
+		</%common:icon_info_block>
+	% endfor
+	% if members == []:
+		<div class="row-fluid"><p>No members</p></div>
+	% endif
+</div>

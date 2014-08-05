@@ -1,8 +1,9 @@
 <%!
 	import web
 %>
-<%page args="owner, repoid, file, style, content"/>
-<%inherit file="main.html"/>
+<%page args="owner, repoid, repoInfo, file, style, content"/>
+<%inherit file="showRepoBase.html"/>
+<%namespace name="common" file="common.html"/>
 
 <%block name="head">
 <style type="text/css">
@@ -10,22 +11,7 @@
 </style>
 </%block>
 
-<div>
-	<h2>${repoid}</h2>
-	<div class="input-prepend input-append">
-		<span class="add-on">HTTPS</span>
-		<input class="span5" id="prependedInput" type="text" value="https://${web.ctx.host}/${owner}/${repoid}.git">
-		<button class="btn" type="button"><i class="icon-share-alt"></i></button>
-	</div>
-</div>
-
-<ul class="nav nav-pills">
-	<li><a href="/${owner}/${repoid}">Files</a></li>
-	<li><a href="/${owner}/${repoid}/commits/master">Commits</a></li>
-	##<li><a href="#" data-toggle="tab">Branches</a></li>
-</ul>
-
-<div class="span12 showfile">
+<div class="showfile">
 	<div class="navbar">
 		<div class="navbar-inner">
 			<p class="navbar-text pull-left">

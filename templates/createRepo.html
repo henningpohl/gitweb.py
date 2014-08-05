@@ -10,21 +10,23 @@
 	$(document).ready(function(){
 		$('#inputNameError').hide();
 		
-		var id_popover = $("#inputName").popover({
+		$("#inputName").popover({
 			trigger: "manual",
 			placement: "right",
+			container: "body",
 			content: ""
 		});
-		
+
 		function updateId() {
 			idStr = makeIdString($("#inputName").val());
 			$("#inputId").val(idStr);
 			
 			if(idStr == $("#inputName").val()) {
 				$("#inputName").popover('hide');
-			} else {
-				id_popover.data("popover").options.content = "Will be created as: " + idStr;
+			} else {		
+				$("#inputName").data("bs.popover").options.content = "Will be created as: " + idStr;
 				$("#inputName").popover('show');
+
 			}
 			
 			if(idStr.length < 3) {
@@ -74,10 +76,10 @@
 
 <h2>Create new repository</h2>
 <form method="POST" class="form-horizontal" id="createRepoForm">
-	<div class="control-group">
-		<label class="control-label" for="inputOwner">Owner</label>
-		<div class="controls">
-			<select id="inputOwner" name="owner" class="input-xlarge">
+	<div class="form-group form-group-lg">
+		<label class="col-md-2 control-label" for="inputOwner">Owner</label>
+		<div class="col-md-6">
+			<select id="inputOwner" name="owner" class="form-control">
 			% for available_owner in form.owner.args:
 				<option value="${available_owner}">${available_owner}</option>
 			% endfor
@@ -85,34 +87,36 @@
 		</div>
 	</div>
 	
-	<div class="control-group">
-		<label class="control-label" for="inputName">Name</label>
-		<div class="controls">
-			<input type="text" id="inputName" name="name" class="input-xlarge" placeholder="Repository Name">
+	<div class="form-group form-group-lg">
+		<label class="col-md-2 control-label" for="inputName">Name</label>
+		<div class="col-md-6">
+			<input type="text" id="inputName" name="name" class="form-control" placeholder="Repository Name">
 			<input type="hidden" id="inputId" name="id" >
 		</div>
 	</div>
 	
-	<div id="inputNameError" class="alert alert-error">
+	<div id="inputNameError" class="alert alert-danger">
 		Unfortunately, this repository already exists
 	</div>	
 		
 		
-	<div class="control-group">
-		<label class="control-label" for="inputDesc">Description (optional)</label>
-		<div class="controls">
-			<textarea name="desc" id="inputDesc" class="input-xlarge" rows="4"></textarea>
+	<div class="form-group">
+		<label class="col-md-2 control-label" for="inputDesc">Description (optional)</label>
+		<div class="col-md-6">
+			<textarea name="desc" id="inputDesc" class="form-control" rows="6"></textarea>
 		</div>
 	</div>
 	
-	<div class="control-group">
-		<label class="control-label" for="inputName">Access</label>
-		<div class="controls">
-			<label class="radio">Public:
-			<input type="radio" name="access" value="public" checked> Anyone can see this repository. You choose who can commit.
+	<div class="form-group form-group-lg">
+		<label class="col-md-2 control-label" for="inputName">Access</label>
+		<div class="radio col-md-6">
+			<label>
+				<input type="radio" name="access" value="public" checked><i>Public</i> &mdash; anyone can see this repository. You choose who can commit.
 			</label>
-			<label class="radio">Private:  
-			<input type="radio" name="access" value="private"> You choose who can see and commit to this repository.
+		</div>
+		<div class="radio col-md-6">
+			<label>
+				<input type="radio" name="access" value="private"><i>Private</i> &mdash; you choose who can see and commit to this repository.
 			</label>
 		</div>
 	</div>
@@ -123,6 +127,6 @@
 		</div>
 	% endif
 	
-	<button class="btn btn-large btn-primary offset5" id="formSubmit" type="submit">Create Repository</button>
-
+	<button class="btn btn-large btn-primary pull-right" id="formSubmit" type="submit">Create Repository</button>
+	<div class="clearfix"></div>
 </form>

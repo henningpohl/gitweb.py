@@ -12,24 +12,27 @@
 	</p>
 </div>
 
-<div class="container-fluid">
-	<div class="row">
-		<ul class="nav nav-pills pull-left">
-			<li <%block name="filesActive"/>><a href="/${owner}/${repoid}">Files</a></li>
-			<li <%block name="commitsActive"/>><a href="/${owner}/${repoid}/commits/master">Commits</a></li>
-			##<li <%block name="branchesActive"/>><a href="#" data-toggle="tab">Branches</a></li>
-			% if 'userLevel' in repoInfo and repoInfo.userLevel == 'admin':
-				<li <%block name="settingsActive"/>><a href="/${owner}/${repoid}/settings">Settings</a></li>
-			% endif
-		</ul>
-		<div class="input-prepend input-append pull-right">
-			<input class="repoUrl span5" type="text" value="https://${web.ctx.host}/${owner}/${repoid}.git">
-			<button class="btn repoUrlButton" type="button" data-clipboard-text="https://${web.ctx.host}/${owner}/${repoid}.git" title="copy to clipboard"><i class="fa fa-clipboard"></i></button>
-			<script type="text/javascript">
-				var clip = new ZeroClipboard($(".repoUrlButton"), {moviePath: "/static/ZeroClipboard.swf"});
-			</script>
-		</div>
+
+<div class="row">
+	<ul class="nav nav-pills pull-left">
+		<li <%block name="filesActive"/>><a href="/${owner}/${repoid}">Files</a></li>
+		<li <%block name="commitsActive"/>><a href="/${owner}/${repoid}/commits/master">Commits</a></li>
+		##<li <%block name="branchesActive"/>><a href="#" data-toggle="tab">Branches</a></li>
+		% if 'userLevel' in repoInfo and repoInfo.userLevel == 'admin':
+			<li <%block name="settingsActive"/>><a href="/${owner}/${repoid}/settings">Settings</a></li>
+		% endif
+	</ul>
+	<div class="input-group col-md-6 pull-right">
+		<input class="repoUrl form-control" type="text" value="https://${web.ctx.host}/${owner}/${repoid}.git">
+		<span class="input-group-addon btn btn-default repoUrlButton" data-clipboard-text="https://${web.ctx.host}/${owner}/${repoid}.git" title="copy to clipboard">
+			<i class="fa fa-clipboard"></i>
+		</span>
+		<script type="text/javascript">
+			var clip = new ZeroClipboard($(".repoUrlButton"), {swfPath: "/static/ZeroClipboard.swf"});
+		</script>
 	</div>
 </div>
 
-${next.body(**pageargs)}
+<div class="row" style="margin-top:10px">
+	${next.body(**pageargs)}
+</div>

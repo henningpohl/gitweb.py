@@ -69,8 +69,8 @@ class adminPanel:
         shutil.rmtree(repopath)
 
     def delete_group(self, groupid):
-        web.config.db.delete("groups", where="id=$u", vars=dict(u=groupid))
         web.config.db.delete("group_users", where="groupid=$u", vars=dict(u=groupid))
+        web.config.db.delete("groups", where="id=$u", vars=dict(u=groupid))
         return "deleted"
 
     def delete_user(self, userid, usertype):

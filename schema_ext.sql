@@ -24,7 +24,7 @@ BEGIN
 	DELETE FROM owners WHERE id=OLD.id;
 END;
 
-/* Prevent deletion of owners */
+/* Assign groups and repositories to dummy users on owner deletion */
 
 CREATE TRIGGER owner_delete BEFORE DELETE ON owners
 BEGIN
@@ -52,6 +52,14 @@ CREATE TRIGGER group_creation BEFORE INSERT ON groups
 BEGIN
 	INSERT INTO owners VALUES(NEW.id, "group");
 	INSERT INTO group_users VALUES(NEW.id, NEW.owner, "admin");
+END;
+
+/* Trigger to remove deleted groups from owners table */
+
+CREATE TRIGGER group_deletion AFTER DELETE ON groups
+BEGIN
+	DELETE FROM group_users WHERE groupid = OLD.id;
+	DELETE FROM owners WHERE id = OLD.id;
 END;
 
 /* Trigger to make repository owners automatically admins */

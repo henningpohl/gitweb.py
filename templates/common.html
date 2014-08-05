@@ -43,6 +43,26 @@
 	% endif
 </%def>
 
+<%def name="icon_info_block()">
+	<div class="row">
+		<div class="col-md-1"><i class="fa ${caller.blockicon()} fa-4x"></i></div>
+		<div class="col-md-10">
+			<h2 style="margin:0px;">${caller.blockhead()}</h2>
+			<p>${caller.blockbody()}</p>
+		</div>
+	</div>
+</%def>
+
+<%def name="icon_info_smblock()">
+	<div class="row">
+		<div class="col-md-1"><i class="fa ${caller.blockicon()} fa-4x"></i></div>
+		<div class="col-md-10">
+			<h4 style="margin:0px;">${caller.blockhead()}</h4>
+			<p class="muted" style="margin-left:10px;">${caller.blockbody()}</p>
+		</div>
+	</div>
+</%def>
+
 <%def name="parent_path(p)">
 	${os.path.split(p)[0]}
 </%def>

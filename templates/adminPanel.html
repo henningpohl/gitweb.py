@@ -129,7 +129,7 @@
 </script>
 </%block>
 
-<div class="alert">
+<div class="alert alert-danger">
 	<button type="button" class="close" data-dismiss="alert">&times;</button>
 	<strong>Warning!</strong> There are no confirmations or checks here. If you click delete something <strong>will</strong> be deleted. Careful. 
 </div>
@@ -158,19 +158,19 @@
 		<td>
 			<div class="btn-group">
 		% if u.type == 'ldapuser':
-			<button class="btn userDelete" data-userid="${u.id}" data-usertype="${u.type}" title="Delete user"><i class="icon-trash"></i></button>
+			<button class="btn userDelete" data-userid="${u.id}" data-usertype="${u.type}" title="Delete user"><i class="fa fa-times"></i></button>
 		% elif u.type == 'localuser':
 			<div class="btn-group">
 			% if u.userrights == "member":
-				<button class="btn userPromote" data-userid="${u.id}" title="Make user admin"><i class="icon-chevron-up"></i></button>
+				<button class="btn userPromote" data-userid="${u.id}" title="Make user admin"><i class="fa fa-chevron-up"></i></button>
 			% endif
 			% if u.userrights == "admin":
-				<button class="btn userDemote" data-userid="${u.id}" title="Remove admin status"><i class="icon-chevron-down"></i></button>
+				<button class="btn userDemote" data-userid="${u.id}" title="Remove admin status"><i class="fa fa-chevron-down"></i></button>
 			% endif
 			% if u.userrights == "none":
-				<button class="btn userApprove" data-userid="${u.id}" title="Approve user"><i class="icon-ok-sign"></i></button>
+				<button class="btn userApprove" data-userid="${u.id}" title="Approve user"><i class="fa fa-check"></i></button>
 			% endif
-			<button class="btn userDelete" data-userid="${u.id}" data-usertype="${u.type}" title="Delete user"><i class="icon-trash"></i></button>
+			<button class="btn userDelete" data-userid="${u.id}" data-usertype="${u.type}" title="Delete user"><i class="fa fa-times"></i></button>
 		% else:
 			You shouldn't see this
 			</div>
@@ -199,8 +199,8 @@
 		<td>${p.name}</td>
 		<td>
 			<div class="btn-group">
-				<button class="btn" title="Change owner"><i class="icon-user"></i></button>
-				<button class="btn groupDelete" data-groupid="${u.id}" title="Delete group"><i class="icon-trash"></i></button>
+				<button class="btn" title="Change owner"><i class="fa fa-user"></i></button>
+				<button class="btn groupDelete" data-groupid="${p.id}" title="Delete group"><i class="fa fa-times"></i></button>
 			</div>
 		</td>
 	</tr>
@@ -228,7 +228,7 @@
 		<td>${u.owner}</td>
 		<td>
 			<div class="btn-group">
-				<button class="btn repoDelete" data-repoid="${u.id}" data-ownerid="${u.owner}" title="Delete repository"><i class="icon-trash"></i></button>
+				<button class="btn repoDelete" data-repoid="${u.id}" data-ownerid="${u.owner}" title="Delete repository"><i class="fa fa-times"></i></button>
 			</div>
 		</td>
 	</tr>
@@ -253,8 +253,8 @@
 			<td>${r}</td>
 			<td>
 				<div class="btn-group">
-					<button class="btn lostRepoAssign" data-repopath="${r}" title="Transfer repository"><i class="icon-gift"></i></button>
-					<button class="btn lostRepoDelete" data-repopath="${r}" title="Purge repository"><i class="icon-trash"></i></button>
+					<button class="btn lostRepoAssign" data-repopath="${r}" title="Transfer repository"><i class="fa fa-gift"></i></button>
+					<button class="btn lostRepoDelete" data-repopath="${r}" title="Purge repository"><i class="fa fa-times"></i></button>
 				</div>
 			</td>
 		</tr>
@@ -265,7 +265,7 @@
 	
 	<div id="lostRepoUserChoice" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 		<div class="modal-header">
-			<button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i></button>
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="fa fa-times"></i></button>
 			<h3 id="myModalLabel">Pick user</h3>
 		</div>
 		<div class="modal-body">

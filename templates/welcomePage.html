@@ -63,49 +63,50 @@
 	</script>
 </%block>
 
-<div class="hero-unit">
+<div class="jumbotron">
 	<h1>${web.config.pagename}</h1>
 	<p>Welcome to our source code repository management system. Please log to use the site. If you haven't used the site before, just register below. However, if you have an LDAP account with us, you can just use that one for logging in. No need to register!</p>
 	
-	<form action="/register" method="POST" class="form-horizontal">		
+	<form action="/register" method="POST" class="form-horizontal" role="form">		
 		<h3>Registration for local account</h3>
 		<p><span class="text-error">Don't</span> register if you have an LDAP account with us already.</p>
-		<div class="control-group">
-			<label class="control-label" for="inputEmail">Email</label>
-			<div class="controls">
-				<input type="text" id="inputEmail" name="email" class="input-xlarge" placeholder="Email" required>
+		
+		<div class="form-group form-group-lg">
+			<label class="col-md-2 control-label" for="inputEmail">Email</label>
+			<div class="col-md-6">
+				<input class="form-control" type="text" id="inputEmail" name="email" placeholder="Email" required>
+			</div>
+		</div>
+
+		<div class="form-group form-group-lg">
+			<label class="col-md-2 control-label" for="inputName">Name</label>
+			<div class="col-md-6">
+				<input class="form-control" type="text" id="inputName" name="name" placeholder="Name" required>
 			</div>
 		</div>
 		
-		<div class="control-group">
-			<label class="control-label" for="inputName">Name</label>
-			<div class="controls">
-				<input type="text" id="inputName" name="name" class="input-xlarge" placeholder="Name" required>
+		<div class="form-group form-group-lg">
+			<label class="col-md-2 control-label" for="inputId">Identifier</label>
+			<div class="col-md-6">
+				<input class="form-control" type="text" id="inputId" name="id" placeholder="Identifier" readonly>
 			</div>
 		</div>
 		
-		<div class="control-group">
-			<label class="control-label" for="inputId">Identifier</label>
-			<div class="controls">
-				<input type="text" id="inputId" name="id" class="input-xlarge" placeholder="Identifier" readonly>
-			</div>
-		</div>
-		
-		<div id="inputIdError" class="alert alert-error">
+		<div id="inputIdError" class="alert alert-danger">
 			Unfortunately, this identifier is already in use
 		</div>
 		
-		<div class="control-group">
-			<label class="control-label" for="inputPass">Password</label>
-			<div class="controls">
-				<input type="password" id="inputPass" name="password" class="input-xlarge" placeholder="Password" required>
+		<div class="form-group form-group-lg">
+			<label class="col-md-2 control-label" for="inputPass">Password</label>
+			<div class="col-md-6">
+				<input class="form-control" type="password" id="inputPass" name="password" placeholder="Password" required>
 			</div>
 		</div>
 		
-		<div class="control-group">
-			<label class="control-label" for="inputPass2">Repeat password</label>
-			<div class="controls">
-				<input type="password" id="inputPass2" name="password2" class="input-xlarge" placeholder="Repeat password" required>
+		<div class="form-group form-group-lg">
+			<label class="col-md-2 control-label" for="inputPass2">Repeat password</label>
+			<div class="col-md-6">
+				<input class="form-control" type="password" id="inputPass2" name="password2" placeholder="Repeat password" required>
 			</div>
 		</div>
 				
@@ -115,6 +116,7 @@
 			</div>
 		% endif
 		
-		<button class="btn btn-large btn-primary offset5" id="formSubmit" type="submit">Register</button>
+		<button class="btn btn-lg btn-primary pull-right" id="formSubmit" type="submit">Register</button>
+		<div class="clearfix"></div>
 	</form>
 </div>

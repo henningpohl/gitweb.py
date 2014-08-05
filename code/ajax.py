@@ -2,11 +2,15 @@ import os
 import json
 import web
 from decorators import requires_login
+from util import make_id_string, check_id
 
 class checkId:
     def GET(self):
         web.header('Content-Type', 'text/plain')
         if 'id' not in web.input():
+            return "false"
+
+        if check_id(web.input().id) == False:
             return "false"
         
         u = web.config.db.select('users', dict(u=web.input().id), where="id=$u", what="id").list()

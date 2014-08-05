@@ -3,17 +3,16 @@
 %>
 <%page args="repos"/>
 <%inherit file="main.html"/>
+<%namespace name="common" file="common.html"/>
 
 <h2>All public repositories</h2>
-<div class="container-fluid">
+<div class="row">
 	% for r in repos:
-	<div class="row-fluid">
-		<div class="span1 offset1"><i class="fa fa-book fa-4x"></i></div>
-		<div class="span10">
-			<h2 style="margin:0px;"><a href="/${r.owner}/${r.id}">${r.owner} / ${r.name}</a></h2>
-			<p>${r.description}&nbsp;</p>
-		</div>
-	</div>
+		<%common:icon_info_block>
+			<%def name="blockicon()">fa-book</%def>
+			<%def name="blockhead()"><a href="/${r.owner}/${r.id}">${r.owner} / ${r.name}</a></%def>
+			<%def name="blockbody()">${r.description}&nbsp;</%def>
+		</%common:icon_info_block>
 	% endfor
 	% if repos == []:
 		<div class="row-fluid"><p>No public repositories</p></div>

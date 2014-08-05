@@ -8,14 +8,14 @@
 <title>GitWeb.py</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="shortcut icon" href="/static/favicon.ico" />
-<link href="/static/bootstrap.min.css" rel="stylesheet" media="screen">
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
 <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
 <link href='//fonts.googleapis.com/css?family=Roboto:400,500,900italic,900,700italic,700,300,300italic,400italic,500italic' rel='stylesheet' type='text/css'>
 <link href='//fonts.googleapis.com/css?family=Droid+Sans+Mono' rel='stylesheet' type='text/css'>
 <link href="/static/style.css" rel="stylesheet" type="text/css">
 <script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
 <script type="text/javascript" src="//code.jquery.com/ui/1.11.0/jquery-ui.min.js"></script>
-<script type="text/javascript" src="/static/bootstrap.min.js"></script>
+<script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="/static/commoncode.js"></script>
 <script type="text/javascript" src="/static/ZeroClipboard.min.js"></script>
 <%block name="head" />
@@ -23,37 +23,50 @@
 
 <body>
 
-<div class="navbar navbar-inverse navbar-fixed-top">
-	<div class="navbar-inner">
-		<div class="container">
-			<a class="brand" href="/">${web.config.pagename}</a>
-			% if web.config.session.loggedin:
-				<form class="navbar-search">
-					<input type="text" class="search-query" placeholder="Search (not working yet)">
-				</form>
-				<ul class="nav pull-right">
-					<li><a href="/${web.config.session.userid}"><i class="fa fa-user"></i> ${web.config.session.userfullname}</a></li>
-					<li><a href="/newRepository" data-toggle="tooltip" data-placement="bottom" title="Create new repository"><i class="fa fa-plus-circle"></i> <i class="fa fa-book"></i></a></li>
-					<li><a href="/newGroup" data-toggle="tooltip" data-placement="bottom" title="Create new group"><i class="fa fa-plus-circle"></i> <i class="fa fa-group"></i></a></li>
-					<li><a href="/settings" data-toggle="tooltip" data-placement="bottom" title="Settings"><i class="fa fa-cog"></i></a></li>
-				% if 'userrights' in web.config.session and web.config.session.userrights == 'admin':
-					<li><a href="/adminPanel" data-toggle="tooltip" data-placement="bottom" title="Admin panel"><i class="fa fa-briefcase"></i></a></li>
-				% endif		
-					<li><a href="/logout" data-toggle="tooltip" data-placement="bottom" title="Sign out"><i class="fa fa-sign-out"></i></a></li>
-				</ul>
-			% else:
-				<form class="navbar-form pull-right" action="/login" method="POST" >
-					<input class="span3" name="username" type="text" placeholder="Email or ldap username">
-					<input class="span2" name="password" type="password" placeholder="Password">
-					<button type="submit" class="btn btn-inverse">Sign in</button>
-				</form>
-			% endif
+<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+	<div class="container">
+		<div class="navbar-header">
+			<a class="navbar-brand" href="/">${web.config.pagename}</a>
+		</div>
+		<div class="navbar-collapse collapse">
+		% if web.config.session.loggedin:
+			<form class="navbar-form navbar-left" role="search">
+				<div class="form-group">
+					<input type="text" class="form-control" placeholder="Search (not working yet)">
+				</div>
+			</form>
+			<ul class="nav navbar-nav navbar-right">
+				<li><a href="/${web.config.session.userid}"><i class="fa fa-user"></i> ${web.config.session.userfullname}</a></li>
+				<li><a href="/newRepository" data-toggle="tooltip" data-placement="bottom" title="Create new repository"><i class="fa fa-plus-circle"></i> <i class="fa fa-book"></i></a></li>
+				<li><a href="/newGroup" data-toggle="tooltip" data-placement="bottom" title="Create new group"><i class="fa fa-plus-circle"></i> <i class="fa fa-group"></i></a></li>
+				<li><a href="/settings" data-toggle="tooltip" data-placement="bottom" title="Settings"><i class="fa fa-cog"></i></a></li>
+			% if 'userrights' in web.config.session and web.config.session.userrights == 'admin':
+				<li><a href="/adminPanel" data-toggle="tooltip" data-placement="bottom" title="Admin panel"><i class="fa fa-briefcase"></i></a></li>
+			% endif		
+				<li><a href="/logout" data-toggle="tooltip" data-placement="bottom" title="Sign out"><i class="fa fa-sign-out"></i></a></li>
+			</ul>
+		% else:
+			<form class="navbar-form navbar-right" action="/login" method="POST" role="form">
+				<div class="form-group">
+					<input class="form-control" name="username" type="text" placeholder="Email or ldap username">
+				</div>
+				<div class="form-group">
+					<input class="form-control" name="password" type="password" placeholder="Password">
+				</div>
+				<div class="form-group">
+					<button class="form-control" type="submit" class="btn btn-inverse">Sign in</button>
+				</div>
+			</form>
+		% endif
 		</div>
 	</div>
 </div>
 
 <div class="container">
+
   ${next.body(**pageargs)}
+  
+  <div class="clearfix"></div>
   <hr>
   <footer>
     <p>&copy; gitweb.py 2014</p>

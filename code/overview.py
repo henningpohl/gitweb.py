@@ -27,7 +27,8 @@ class allGroups:
               FROM groups
                 LEFT JOIN group_users ON groups.id = group_users.groupid
                 LEFT JOIN repositories ON groups.id = repositories.owner
-              GROUP BY groups.id""").list()
+              GROUP BY groups.id
+              ORDER BY UPPER(groups.owner)""").list()
         
         return render.allGroups(groups=grouplist)
 
@@ -38,7 +39,8 @@ class allRepositories:
         repolist = web.config.db.query(
             """SELECT id, name, owner, description
                FROM repositories
-               WHERE access = 'public'""").list()
+               WHERE access = 'public'
+               ORDER BY UPPER(owner)""").list()
         
         return render.allRepositories(repos=repolist)
 

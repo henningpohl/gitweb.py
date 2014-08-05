@@ -13,6 +13,7 @@
 		var id_popover = $("#inputName").popover({
 			trigger: "manual",
 			placement: "right",
+			container: "body",
 			content: ""
 		});
 
@@ -23,11 +24,11 @@
 			if(idStr == $("#inputName").val()) {
 				$("#inputName").popover('hide');
 			} else {
-				id_popover.data("popover").options.content = "Will be created as: " + idStr;
+				id_popover.data("bs.popover").options.content = "Will be created as: " + idStr;
 				$("#inputName").popover('show');
 			}
 			
-			$.get('/checkId?id=' + $("#inputId").val() + '&repo=' + idStr, function(data) {
+			$.get('/checkId?id=' + $("#inputId").val(), function(data) {
 				if(data == "true") {
 					$(".control-group:has(#inputId)").removeClass("error");
 					$('#inputNameError').hide();
@@ -47,7 +48,7 @@
 		});
 			
 		$("#formSubmit").click(function(){
-			$.get('/checkId?id=' + $("#inputId").val() + '&repo=' + "oops", function(data) {
+			$.get('/checkId?id=' + $("#inputId").val(), function(data) {
 				if(data == "true") {
 					$("#createGroupForm").submit()
 				} else {
@@ -64,22 +65,36 @@
 <h2>Create new group</h2>
 
 <form method="POST" class="form-horizontal" id="createGroupForm">
-	<div class="control-group">
-		<label class="control-label" for="inputName">Group name</label>
-		<div class="controls">
-			<input type="text" id="inputName" name="name" class="input-xlarge" placeholder="Group name">
+	<div class="form-group form-group-lg">
+		<label class="col-md-2 control-label" for="inputName">Group name</label>
+		<div class="col-md-6">
+			<input type="text" id="inputName" name="name" class="form-control" placeholder="Group name">
 			<input type="hidden" id="inputId" name="id" >
 		</div>
 	</div>
 	
-	<div id="inputNameError" class="alert alert-error">
+	<div id="inputNameError" class="alert alert-danger">
 		Unfortunately, this identifier is already in use
 	</div>	
 	
-	<div class="control-group">
-		<label class="control-label" for="inputDesc">Description (optional)</label>
-		<div class="controls">
-			<textarea name="desc" id="inputDesc" class="input-xlarge" rows="4"></textarea>
+	<div class="form-group">
+		<label class="col-md-2 control-label" for="inputDesc">Description (optional)</label>
+		<div class="col-md-6">
+			<textarea name="desc" id="inputDesc" class="form-control" rows="6"></textarea>
+		</div>
+	</div>
+	
+	<div class="form-group form-group-lg">
+		<label class="col-md-2 control-label" for="inputName">Joinable</label>
+		<div class="radio col-md-6">
+			<label>
+				<input type="radio" name="joinable" value="yes" checked> Anybody can join this group.
+			</label>
+		</div>
+		<div class="radio col-md-6">
+			<label>
+				<input type="radio" name="joinable" value="no"> Only group admins can add members.
+			</label>
 		</div>
 	</div>
 	
@@ -89,7 +104,7 @@
 		</div>
 	% endif
 	
-	<button class="btn btn-large btn-primary offset5" id="formSubmit" type="submit">Create group</button>
-
+	<button class="btn btn-large btn-primary pull-right" id="formSubmit" type="submit">Create group</button>
+	<div class="clearfix"></div>
 </form>
 

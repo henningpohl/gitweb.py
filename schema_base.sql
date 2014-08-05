@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS groups (
 	id NVARCHAR(255)  PRIMARY KEY,
 	name NVARCHAR(255)  NOT NULL,
 	owner NVARCHAR(255)  NOT NULL,
+	joinable INTEGER NOT NULL DEFAULT 0,
 	description TEXT  NULL,
 	FOREIGN KEY (id) REFERENCES owners(id),
 	FOREIGN KEY (owner) REFERENCES owners(id)
@@ -95,11 +96,11 @@ CREATE VIEW IF NOT EXISTS repo_access AS
 	CASE WHEN group_users.role = "member" AND repo_users.access = "admin" THEN "write" ELSE repo_users.access END AS access
 	FROM group_users INNER JOIN repo_users ON (groupid = repo_users.userid)
 	UNION
-	SELECT users.id as userid, repositories.id as repoid, repositories.owner as repoowner, "write" as access
+	SELECT users.id as userid, repositories.id as repoid, repositories.owner as repoowner, "read" as access
 	FROM users 
 	LEFT JOIN repositories ON users.id != repositories.owner 
 	LEFT JOIN repo_users ON users.id = repo_users.userid AND repo_users.repoid = repositories.id AND repo_users.repoowner = repositories.owner
-	WHERE repositories.access = "public" AND repo_users.access IS NULL
+	WHERE repositories.access = "public" AND repo_users.access IS NULL;
 	
 /* Create dummy owner to transfer repositories and groups on owner deletion */
 INSERT INTO owners VALUES ("dummy", "dummy");

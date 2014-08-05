@@ -1,0 +1,159 @@
+<%!
+	import web
+%>
+<%page args="group, repos, members, role, users"/>
+<%inherit file="ownerBase.html"/>
+<%namespace name="common" file="common.html"/>
+
+<%block name="head">
+	<script>
+	$(document).ready(function(){
+		$(".userRemove").click(function() {
+			var tempForm = $('<form method="POST"/>');
+			tempForm.append($('<input type="hidden" name="type" value="remove"/>'));
+			tempForm.append($('<input type="text" name="userid" value="' + $(this).data('userid') + '"/>'));
+			tempForm.submit();
+		});
+			
+		$(".userAdmin").click(function() {
+			var tempForm = $('<form method="POST"/>');
+			tempForm.append($('<input type="hidden" name="type" value="rights"/>'));
+			tempForm.append($('<input type="text" name="userid" value="' + $(this).data('userid') + '"/>'));
+			tempForm.append($('<input type="text" name="access" value="admin"/>'));
+			tempForm.submit();
+		});
+		
+		function checkConfirmString(elem) {
+			if(elem.val() == "yes, I really want to delete this group") {
+				elem.siblings().find(".confirmSubmit").attr("disabled", false);
+			} else {
+				elem.siblings().find(".confirmSubmit").attr("disabled", true);
+			}
+		}
+		
+		$(".confirmText").keyup(function() {
+			checkConfirmString($(this));
+		});
+		
+		$(".confirmText").blur(function() {
+			checkConfirmString($(this));
+		});
+	});
+	</script>
+</%block>
+
+<%block name="icon">fa-group</%block>
+<%block name="owner">${group.name}</%block>
+<%block name="tagline">
+% if group.description:
+	${group.description}
+% else:
+	No description
+% endif
+</%block>
+
+<%block name="header_extra">
+	<button type="button" class="btn btn-danger btn-lg userRemove" data-userid="${web.config.session.userid}"><i class="fa fa-minus"></i> &nbsp; Leave group</button>
+</%block>
+
+<div class="col-md-8">
+	<h2>Repositories</h2>
+	<div class="container-fluid">
+		% for r in repos:
+			<%common:icon_info_block>
+				<%def name="blockicon()">fa-book</%def>
+				<%def name="blockhead()"><a href="/${r.owner}/${r.id}">${r.owner} / ${r.name}</a></%def>
+				<%def name="blockbody()">Last updated ${common.how_long_ago(r.lastUpdate)}</%def>
+			</%common:icon_info_block>
+		% endfor
+		% if repos == []:
+			<div class="row-fluid"><p>No repositories</p></div>
+		% endif
+	</div>
+
+	<h2>Members</h2>
+	<div class="container-fluid">
+		% for m in members:
+			% if role == 'admin':
+				<%common:icon_info_block>
+					<%def name="blockicon()">fa-user</%def>
+					<%def name="blockhead()">
+						<a href="/${m.id}">${m.name}</a>
+						<button class="btn btn-sm userRemove" data-userid="${m.id}" title="remove from group"><i class="fa fa-times"></i></button>
+						% if m.role != 'admin':
+							<button class="btn btn-sm userAdmin" data-userid="${m.id}" title="make admin"><i class="fa fa-briefcase"></i></button>
+						% endif
+					</%def>
+					<%def name="blockbody()">${m.role}</%def>
+				</%common:icon_info_block>
+			% else:
+				<%common:icon_info_block>
+					<%def name="blockicon()">fa-user</%def>
+					<%def name="blockhead()"><a href="/${m.id}">${m.name}</a></%def>
+					<%def name="blockbody()">${m.role}</%def>
+				</%common:icon_info_block>			
+			% endif
+		% endfor
+		% if members == []:
+			<div class="row-fluid"><p>No members</p></div>
+		% endif
+	</div>
+</div>
+
+% if role == 'admin':
+<div class="col-md-4 well">
+	<h4>Update Group Info</h4>
+	
+	<form method="POST" role="form">
+		<div class="form-group">
+			<label for="inputDesc">Description</label>
+			<textarea name="desc" id="inputDesc" class="form-control" rows="4">${group.description}</textarea>
+		</div>
+		
+		<div class="form-group">
+			<label for="inputName">Joinable</label>
+			<div class="radio">
+				<label>
+					<input type="radio" name="joinable" value="yes" ${"checked" if group.joinable == 1 else ""}>Anybody can join this group.
+				</label>
+			</div>
+			<div class="radio">
+				<label>
+					<input type="radio" name="joinable" value="no" ${"checked" if group.joinable == 0 else ""}>Only group admins can add members.
+				</label>
+			</div>
+		</div>
+		
+		<input type="hidden" name="type" value="info" />
+		<button class="btn btn-large btn-primary pull-right" type="submit">Update Group Information</button>
+	</form>
+	
+	<div class="clearfix"></div>
+
+	<h4>Add member</h4>
+	<form method="POST" class="form-horizontal">
+		<input type="hidden" name="type" value="user" />
+		<select name="userid" class="form-control">
+		% for u in users:
+			<option value="${u.id}">${u.name} (${u.id})</option>
+		% endfor
+		</select>
+		<button class="btn btn-primary pull-right" type="submit">Add collaborator</button>
+	</form>
+	
+	<div class="clearfix"></div>
+	
+	<h4>Delete group</h4>
+	<p>Deleting a group removes all associated data from the server. Neither you or any of your collaborators will be able to access it afterwards. To confirm this step enter <strong>yes, I really want to delete this group</strong> in the box below.</p>
+
+	<form method="POST" class="form-inline col-md-12">
+		<input type="hidden" name="type" value="delete" />
+		<div class="input-group col-md-12">
+			<input class="form-control confirmText" type="text" name="confirm" />
+			<span class="input-group-btn">
+				<button class="btn btn-danger confirmSubmit" type="submit" disabled>Delete Group</button>
+			</span>
+		</div>
+	</form>
+</div>
+% endif

@@ -6,6 +6,5 @@ function makeIdString(str) {
 }
 
 $(document).ready(function(){
-	$("[data-toggle='tooltip']").tooltip();
-	console.log($("[data-toggle='tooltip']"));
+	$("[data-toggle='tooltip']").tooltip({container:"body"});
 });

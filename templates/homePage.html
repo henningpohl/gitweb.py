@@ -6,53 +6,55 @@
 <%inherit file="main.html"/>
 <%namespace name="common" file="common.html"/>
 
-<div class="container-fluid">
-	<div class="row-fluid">
-		<div class="span8">
-			<h2>Latest updates</h2>
-			% if len(news) == 0:
-				<p>Nothing happening :(</p>
-			% else:
-				% for n in news:
-					<div style="margin-bottom:40px;">
-						<div>
-							<div class="pull-left"><i class="fa fa-cloud-upload fa-4x"></i></div>
-							<h4><i class="fa fa-user"></i> ${n.author} committed to <a href="/${n.ownerid}/${n.repoid}"><i class="fa fa-book"></i> ${n.repoid}</a></h4>
-							<p class="muted" style="margin-left:70px;">${common.how_long_ago(datetime.datetime.fromtimestamp(n.date))} [<a href="/${n.ownerid}/${n.repoid}/commit/${n.hexsha}">${n.hexsha[:6]}...</a>]</p>
-						</div>
-						<div class="well well-small">
-							<i class="fa fa-comments fa-2x" style="margin-right:10px;"></i> ${n.message} 
-						</div>
+<div>
+	<h2>Latest updates</h2>
+</div>
+
+<div class="row">
+	<div class="col-md-8">
+		% if len(news) == 0:
+			<p>Nothing happening :(</p>
+		% else:
+			% for n in news:
+				<div style="margin-bottom:40px;">
+					<%common:icon_info_smblock>
+						<%def name="blockicon()">fa-cloud-upload</%def>
+						<%def name="blockhead()"><i class="fa fa-user"></i> ${n.author} committed to <a href="/${n.ownerid}/${n.repoid}"><i class="fa fa-book"></i> ${n.repoid}</a></%def>
+						<%def name="blockbody()">${common.how_long_ago(datetime.datetime.fromtimestamp(n.date))} [<a href="/${n.ownerid}/${n.repoid}/commit/${n.hexsha}">${n.hexsha[:6]}...</a>]</%def>
+					</%common:icon_info_smblock>
+
+					<div class="well well-small">
+						<i class="fa fa-comments fa-2x" style="margin-right:10px;"></i> ${n.message} 
 					</div>
-				% endfor
-			% endif
-		</div>
-		<div class="span4 well well-small">
-			<h4>Overview</h4>
-				<ul>
-					<li><a href="/allGroups">See all public groups</a></li>
-					<li><a href="/allRepositories">See all public repositories</a></li>
-				</ul>
-			<h4>Your groups</h4>
-			% if len(groups) == 0:
-				<p>Currently no groups</p>
-			% else:
-				<ul>
-				% for g in groups:
-					<li><a href="/${g.id}">${g.name}</a></li>
-				% endfor
-				</ul>
-			% endif
-			% if len(repositories) == 0:
-				<p>Currently no repositories</p>
-			% else:
-				<h4>Your repositories</h4>
-				<ul>
-				% for r in repositories:
-					<li><a href="/${r.owner}/${r.id}">${r.owner}/${r.name}</a></li>
-				% endfor
-				</ul>
-			% endif
-		</div>
+				</div>
+			% endfor
+		% endif
+	</div>
+	<div class="col-md-4 well well-small">
+		<h4>Overview</h4>
+			<ul>
+				<li><a href="/allGroups">See all public groups</a></li>
+				<li><a href="/allRepositories">See all public repositories</a></li>
+			</ul>
+		<h4>Your groups</h4>
+		% if len(groups) == 0:
+			<p>Currently no groups</p>
+		% else:
+			<ul>
+			% for g in groups:
+				<li><a href="/${g.id}">${g.name}</a></li>
+			% endfor
+			</ul>
+		% endif
+		% if len(repositories) == 0:
+			<p>Currently no repositories</p>
+		% else:
+			<h4>Your repositories</h4>
+			<ul>
+			% for r in repositories:
+				<li><a href="/${r.owner}/${r.id}">${r.owner}/${r.name}</a></li>
+			% endfor
+			</ul>
+		% endif
 	</div>
 </div>

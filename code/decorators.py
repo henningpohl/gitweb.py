@@ -30,9 +30,17 @@ def requires_repo_admin(func):
             return func(*args, **kwargs)
     return wrapped
 
+def requires_group_admin(func):
+    def wrapped(*args, **kwargs):
+        if len(args) != 2:
+            raise web.seeother('/')
+
+        return func(*args, **kwargs)
+    return wrapped
+
 def requires_repo_access(func):
     def wrapped(*args, **kwargs):
-        if len(args) != 3:
+        if len(args) < 3:
             raise web.seeother('/')
 
         d = dict(o=args[1],i=args[2],u=web.config.session.userid)

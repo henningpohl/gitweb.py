@@ -9,8 +9,7 @@
 
 <%block name="filesActive">class="active"</%block>
 
-
-<table class="table table-bordered table-condensed">
+<table class="table table-bordered table-hover table-condensed">
 	<thead>
 		<tr>
 			<th>Filename</th>
@@ -27,11 +26,11 @@
 	% for f in filelist:
 		<tr>
 			% if f[0].type == "blob":
-				<td><i class="icon-file"></i> <a href="/${owner}/${repoid}/blob/master/${f[0].path}">${f[0].name}</a></td>
+				<td><i class="fa fa-file"></i> &nbsp; <a href="/${owner}/${repoid}/blob/master/${f[0].path}">${f[0].name}</a></td>
 			% elif f[0].type == "tree":
-				<td><i class="icon-folder-open"></i> <a href="/${owner}/${repoid}/tree/master/${f[0].path}">${f[0].name}</a></td>
+				<td><i class="fa fa-folder"></i> &nbsp; <a href="/${owner}/${repoid}/tree/master/${f[0].path}">${f[0].name}</a></td>
 			% else:
-				<td><i class=" icon-question-sign"></i> <a href="/${owner}/${repoid}/${f[0].type}/master/${f[0].path}">${f[0].name}</a></td>
+				<td><i class="fa fa-question-sign"></i> &nbsp; <a href="/${owner}/${repoid}/${f[0].type}/master/${f[0].path}">${f[0].name}</a></td>
 			% endif
 		% if f[1] == None:
 			<td></td>

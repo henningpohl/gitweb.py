@@ -89,6 +89,10 @@ defaultDiacriticsRemovalMap = [
     dict(base='z',  letters=u"[\u007A\u24E9\uFF5A\u017A\u1E91\u017C\u017E\u1E93\u1E95\u01B6\u0225\u0240\u2C6C\uA763]")
 ]
 
+reserved_keywords = ["register", "login", "logout", "checkid", "checkrepo",
+                      "newrepository", "newgroup", "adminpanel", "admin",
+                      "allgroups", "allrepositories", "search"]
+
 def make_id_string(s):
     try:
         s = unicode(s.encode('utf-8'))
@@ -102,9 +106,7 @@ def make_id_string(s):
 
 def check_id_exact(id):
     # Ids can't be keywords already used in urls
-    if id.lower() in ["register", "login", "logout", "checkid", "checkrepo",
-                      "newrepository", "newgroup", "adminpanel", "admin",
-                      "allgroups", "allrepositories", "search"]:
+    if id.lower() in reserved_keywords:
         return False
     
     return True
@@ -112,13 +114,11 @@ def check_id_exact(id):
 
 def check_id_similar(id):
     id = id.lower()
-    keywords = ["register", "login", "logout", "checkid", "checkrepo",
-                "newrepository", "newgroup", "adminpanel", "admin"]
     
     # ids can't be similar to keywords
-    for keyword in keywords:
+    for keyword in reserved_keywords:
         seq = difflib.SequenceMatcher(a=id, b=keyword)
-        if seq.ratio() > 0.7:
+        if seq.ratio() > 0.8:
             return False
     return True
 
