@@ -30,7 +30,7 @@
 				% if line[0] == '+':
 					<tr class="success">
 				% elif line[0] == '-':
-					<tr class="error">
+					<tr class="danger">
 				% elif line[0] == '?':
 					<tr class="warning">
 				% elif line[0] == '@':
@@ -80,7 +80,7 @@
 	% for change in changes:
 		<div style="margin-top:30px;">
 			% if change.deleted_file:
-				<span class="label label-important">Deleted</span> ${change.a_blob.path}
+				<span class="label label-danger">Deleted</span> ${change.a_blob.path}
 			% elif change.renamed:
 				<span class="label label-info">Renamed</span> ${change.rename_from} to ${change.rename_to}				
 			% elif change.new_file:
